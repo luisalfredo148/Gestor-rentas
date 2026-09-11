@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1F4B43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gestor de Rentas">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Gestor de Rentas</title>
+<style>
+  :root{
+    --bg: #FAF8F3;
+    --surface: #FFFFFF;
+    --line: #E4DDCE;
+    --ink: #201E1B;
+    --ink-soft: #6B6459;
+    --teal: #1F4B43;
+    --teal-dark: #143530;
+    --gold: #B8862E;
+    --red: #B0453A;
+    --green-soft: #3C6E52;
+    --blue: #2F6FA8;
+    --purple: #7B4FA0;
+    --rose: #B0455D;
+    --indigo: #4B4FA5;
+    --amber: #C08A28;
+    --radius: 14px;
+    --nav-h: 66px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    overscroll-behavior-y:none;
+  }
+  header.top{
+    position:sticky; top:0; z-index:20;
+    background:var(--teal); color:#F4EFE3;
+    padding:14px 18px; border-bottom:3px solid var(--gold);
+    display:flex; align-items:center; gap:12px;
+  }
+  header.top .logo{flex:0 0 auto;}
+  header.top h1{
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:20px; margin:0; font-weight:700; letter-spacing:.2px;
+  }
+  header.top .sub{font-size:12px; opacity:.75; margin-top:2px;}
+  main{
+    padding:14px 14px calc(var(--nav-h) + 90px);
+    min-height:100vh;
+    max-width:560px;
+    margin:0 auto;
+  }
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* Chips (property filter) */
+  .chips{display:flex; gap:8px; overflow-x:auto; -webkit-overflow-scrolling:touch; padding-bottom:2px; margin-bottom:14px;}
+  .chip{
+    flex:0 0 auto; padding:7px 14px; border-radius:20px; border:1px solid var(--line);
+    background:var(--surface); font-size:13px; font-weight:600; color:var(--ink-soft);
+    cursor:pointer; white-space:nowrap;
+  }
+  .chip.active{background:var(--teal); color:#F4EFE3; border-color:var(--teal);}
+
+  /* Cards */
+  .card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:14px 16px;
+    margin-bottom:10px;
+  }
+  .grid-summary{
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    margin-bottom:16px;
+  }
+  .stat{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:14px;
+  }
+  .stat .label{font-size:12.5px; color:var(--ink-soft); margin-bottom:6px;}
+  .stat .value{font-size:21px; font-weight:700; color:var(--teal-dark);}
+  .stat .value.neg{color:var(--red);}
+  .section-title{
+    font-size:14px; font-weight:700; color:var(--ink-soft);
+    margin:18px 2px 8px;
+  }
+  .section-title.c-blue{color:var(--blue); border-left:4px solid var(--blue); padding-left:9px;}
+  .section-title.c-purple{color:var(--purple); border-left:4px solid var(--purple); padding-left:9px;}
+  .section-title.c-green{color:var(--green-soft); border-left:4px solid var(--green-soft); padding-left:9px;}
+  .section-title.c-rose{color:var(--rose); border-left:4px solid var(--rose); padding-left:9px;}
+  .section-title.c-indigo{color:var(--indigo); border-left:4px solid var(--indigo); padding-left:9px;}
+  .section-title.c-amber{color:var(--amber); border-left:4px solid var(--amber); padding-left:9px;}
+  .card-blue{border-left:4px solid var(--blue);}
+  .card-purple{border-left:4px solid var(--purple);}
+  .card-green{border-left:4px solid var(--green-soft);}
+  .card-rose{border-left:4px solid var(--rose);}
+  .card-indigo{border-left:4px solid var(--indigo);}
+  .card-amber{border-left:4px solid var(--amber);}
+  .stat-icon{
+    width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    margin-bottom:8px;
+  }
+  .stat-icon svg{width:18px; height:18px;}
+  .stat-icon.bg-green{background:#E4F0E9; color:var(--green-soft);}
+  .stat-icon.bg-rose{background:#F7E3E7; color:var(--rose);}
+  .stat-icon.bg-teal{background:#DCEAE7; color:var(--teal-dark);}
+  .stat-icon.bg-purple{background:#EBE2F2; color:var(--purple);}
+  .stat-icon.bg-indigo{background:#E3E4F5; color:var(--indigo);}
+  .stat-icon.bg-amber{background:#F6E7D8; color:var(--amber);}
+  .row-item{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .row-item .main{flex:1; min-width:0;}
+  .item-name{font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .item-meta{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .item-amount{font-weight:700; font-size:15px; white-space:nowrap;}
+  .item-amount.pos{color:var(--green-soft);}
+  .item-amount.neg{color:var(--red);}
+  .thumb{width:52px; height:52px; border-radius:10px; object-fit:cover; background:#EDE7DA; flex:0 0 auto;}
+  .tag{
+    display:inline-block; font-size:11px; padding:2px 8px; border-radius:20px;
+    background:#F0EBE1; color:var(--ink-soft); margin-top:4px;
+  }
+  .tag.paid{background:#E4F0E9; color:var(--green-soft);}
+  .tag.pending{background:#F6E7D8; color:var(--gold);}
+  .tag.partial{background:#FBEFE0; color:var(--gold);}
+  .balance-note{font-size:12.5px; color:var(--red); margin-top:2px; font-weight:600;}
+  .empty{text-align:center; padding:40px 20px; color:var(--ink-soft); font-size:14px;}
+
+  /* Property cards with photo */
+  .property-card{padding:0; overflow:hidden;}
+  .property-card .photo-card-img{width:100%; height:130px; object-fit:cover; display:block; background:#EDE7DA;}
+  .property-card .body{padding:12px 16px;}
+
+  /* Bottom nav */
+  nav.bottom{
+    position:fixed; bottom:0; left:0; right:0; z-index:30;
+    background:var(--surface); border-top:1px solid var(--line);
+    display:flex; height:var(--nav-h); overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  nav.bottom button{
+    flex:0 0 auto; min-width:76px; background:none; border:none; font-size:11.5px; color:var(--ink-soft);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:4px; font-weight:600; cursor:pointer; padding:0 6px;
+  }
+  nav.bottom button .dot{width:6px; height:6px; border-radius:50%; background:transparent;}
+  nav.bottom button.active{color:var(--teal-dark);}
+  nav.bottom button.active .dot{background:var(--gold);}
+  nav.bottom button[data-view="propiedades"].active .dot{background:var(--blue);}
+  nav.bottom button[data-view="inquilinos"].active .dot{background:var(--purple);}
+  nav.bottom button[data-view="rentas"].active .dot{background:var(--green-soft);}
+  nav.bottom button[data-view="gastos"].active .dot{background:var(--rose);}
+  nav.bottom button[data-view="millas"].active .dot{background:var(--indigo);}
+  nav.bottom button[data-view="horas"].active .dot{background:var(--amber);}
+
+  /* Floating add button */
+  .fab{
+    position:fixed; right:18px; bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));
+    width:54px; height:54px; border-radius:50%;
+    background:var(--teal); color:#F4EFE3; border:none;
+    font-size:26px; font-weight:400; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 16px rgba(20,53,48,.35); z-index:25; cursor:pointer;
+  }
+
+  /* Modal / bottom sheet */
+  .overlay{position:fixed; inset:0; background:rgba(20,20,18,.4); display:none; align-items:flex-end; z-index:40;}
+  .overlay.open{display:flex;}
+  .sheet{
+    background:var(--bg); width:100%; max-width:560px; margin:0 auto;
+    border-radius:20px 20px 0 0; padding:18px 18px calc(20px + env(safe-area-inset-bottom));
+    max-height:88vh; overflow-y:auto;
+  }
+  .sheet h2{margin:0 0 14px; font-size:17px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12.5px; color:var(--ink-soft); margin-bottom:5px; font-weight:600;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 12px; border:1px solid var(--line); border-radius:10px;
+    font-size:15px; background:var(--surface); color:var(--ink); font-family:inherit;
+  }
+  .field textarea{resize:vertical; min-height:60px;}
+  .photo-upload{border:1.5px dashed var(--line); border-radius:12px; padding:14px; text-align:center; background:var(--surface);}
+  .photo-upload input[type=file]{display:block; margin:0 auto; font-size:13px; width:auto;}
+  .photo-upload img{max-width:100%; max-height:160px; border-radius:10px; margin-top:10px; object-fit:cover;}
+  .photo-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:10px;}
+  .photo-grid .ph{position:relative; aspect-ratio:1; border-radius:10px; overflow:hidden; background:#EDE7DA;}
+  .photo-grid .ph img{width:100%; height:100%; object-fit:cover; display:block;}
+  .photo-grid .ph button{position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; background:rgba(20,20,18,.65); color:#fff; border:none; font-size:13px; line-height:1; cursor:pointer;}
+  .photo-badge{position:absolute; right:8px; bottom:8px; background:rgba(20,20,18,.65); color:#fff; font-size:11px; padding:3px 8px; border-radius:12px; font-weight:600;}
+  .sheet-actions{display:flex; gap:10px; margin-top:16px;}
+  .btn{flex:1; padding:13px; border-radius:10px; border:none; font-size:15px; font-weight:700; cursor:pointer;}
+  .btn.primary{background:var(--teal); color:#F4EFE3;}
+  .btn.ghost{background:var(--surface); color:var(--ink); border:1px solid var(--line);}
+  .btn.danger{background:#FBEAE7; color:var(--red);}
+  .btn.block{width:100%; margin-bottom:18px;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .hint{font-size:12px; color:var(--ink-soft); margin-top:10px; line-height:1.5;}
+</style>
+</head>
+<body>
+<div id="login-screen" style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;">
+  <div style="width:100%; max-width:380px;">
+    <div style="text-align:center; margin-bottom:22px;">
+      <svg viewBox="0 0 100 100" width="64" height="64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="logoGradLogin" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#1F4B43"/><stop offset="55%" stop-color="#2F8F73"/><stop offset="100%" stop-color="#3AA0A0"/>
+        </linearGradient></defs>
+        <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#logoGradLogin)"/>
+        <path d="M50 18 L82 44 V80 H18 V44 Z" fill="none" stroke="#F4EFE3" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="39" y="50" width="22" height="30" rx="3" fill="#E3A63E"/>
+        <circle cx="50" cy="65" r="3.4" fill="#143530"/>
+      </svg>
+      <h1 style="font-family:Georgia,'Times New Roman',serif; font-size:20px; color:var(--teal-dark); margin:10px 0 0;">Gestor de Rentas</h1>
+      <div id="loginSubtitle" style="font-size:13px; color:var(--ink-soft); margin-top:4px;">Crea tu acceso</div>
+    </div>
+    <div class="card">
+      <button class="btn primary block" id="btnBioLogin" style="display:none; width:100%; margin-bottom:14px;">Usar huella / Face ID</button>
+      <div class="field"><label>Usuario</label><input id="li_user" type="text" autocomplete="username"></div>
+      <div class="field"><label>Contraseña</label><input id="li_pass" type="password" autocomplete="current-password"></div>
+      <div class="field" id="li_confirmWrap"><label>Confirmar contraseña</label><input id="li_pass2" type="password"></div>
+      <div id="loginError" class="balance-note" style="display:none; margin-bottom:10px;"></div>
+      <button class="btn primary block" id="btnLogin" style="width:100%;">Continuar</button>
+      <div style="text-align:center; margin-top:14px;">
+        <a href="#" id="linkForgot" style="font-size:12.5px; color:var(--ink-soft);">¿Olvidaste tu acceso?</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="app-screen" style="display:none;">
+<header class="top">
+  <svg class="logo" viewBox="0 0 100 100" width="38" height="38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs><linearGradient id="logoGradTop" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#173F38"/><stop offset="55%" stop-color="#2F8F73"/><stop offset="100%" stop-color="#3AA0A0"/>
+    </linearGradient></defs>
+    <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#logoGradTop)"/>
+    <path d="M50 18 L82 44 V80 H18 V44 Z" fill="none" stroke="#F4EFE3" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="39" y="50" width="22" height="30" rx="3" fill="#E3A63E"/>
+    <circle cx="50" cy="65" r="3.4" fill="#143530"/>
+  </svg>
+  <div>
+    <h1>Gestor de Rentas</h1>
+    <div class="sub" id="headerSub">Cargando…</div>
+  </div>
+</header>
+
+<main>
+  <!-- RESUMEN -->
+  <section class="view active" id="view-resumen">
+    <div class="chips" id="chips-resumen"></div>
+    <div class="grid-summary">
+      <div class="stat">
+        <div class="stat-icon bg-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+        <div class="label">Renta cobrada (mes)</div><div class="value" id="statRentMonth">$0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon bg-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8z"/><line x1="8" y1="8" x2="14" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/></svg></div>
+        <div class="label">Gastos (mes)</div><div class="value neg" id="statExpMonth">$0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon bg-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+        <div class="label">Ganancia neta (mes)</div><div class="value" id="statNet">$0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon bg-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="label">Inquilinos activos</div><div class="value" id="statTenants">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon bg-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 4 0M5 17a2 2 0 1 1 4 0m6 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0M3 17V9l2-5h14l2 5v8"/></svg></div>
+        <div class="label">Millas (mes)</div><div class="value" id="statMiles">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon bg-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="label">Horas (mes)</div><div class="value" id="statHours">0</div>
+      </div>
+    </div>
+    <button class="btn primary block" id="btnReport">Generar reporte para tu contador</button>
+    <button class="btn ghost block" id="btnShareApp">Compartir solicitud de arrendamiento</button>
+    <button class="btn ghost block" id="btnShareReport">Compartir enlace de reportes con inquilinos</button>
+    <button class="btn ghost block" id="btnEnableBio">Activar huella / Face ID para entrar</button>
+    <button class="btn ghost block" id="btnLogout" style="color:var(--ink-soft);">Cerrar sesión</button>
+    <div class="section-title c-amber">Cobros próximos</div>
+    <div id="upcomingList"></div>
+    <div class="section-title c-rose">Rentas pendientes</div>
+    <div id="pendingList"></div>
+  </section>
+
+  <!-- PROPIEDADES -->
+  <section class="view" id="view-propiedades">
+    <div class="section-title c-blue">Propiedades</div>
+    <div id="propertiesList"></div>
+  </section>
+
+  <!-- INQUILINOS -->
+  <section class="view" id="view-inquilinos">
+    <div class="chips" id="chips-inquilinos"></div>
+    <div class="section-title c-purple">Inquilinos</div>
+    <div id="tenantsList"></div>
+  </section>
+
+  <!-- RENTAS -->
+  <section class="view" id="view-rentas">
+    <div class="chips" id="chips-rentas"></div>
+    <div class="section-title c-green">Pagos de renta</div>
+    <div id="rentsList"></div>
+  </section>
+
+  <!-- GASTOS -->
+  <section class="view" id="view-gastos">
+    <div class="chips" id="chips-gastos"></div>
+    <div class="section-title c-rose">Gastos y biles</div>
+    <div id="expensesList"></div>
+  </section>
+
+  <!-- MILLAS -->
+  <section class="view" id="view-millas">
+    <div class="section-title c-indigo">Millas del negocio</div>
+    <div class="card card-indigo" style="margin-bottom:14px;">
+      <div class="row-item">
+        <div class="main"><div class="item-name">Total registrado</div><div class="item-meta">Deducción estimada · referencia $0.70/milla</div></div>
+        <div class="item-amount pos" id="milesTotal">0 mi</div>
+      </div>
+    </div>
+    <div id="mileageList"></div>
+  </section>
+
+  <!-- HORAS -->
+  <section class="view" id="view-horas">
+    <div class="section-title c-amber">Horas del negocio</div>
+    <div id="hoursList"></div>
+  </section>
+</main>
+
+<button class="fab" id="fabAdd">+</button>
+
+<nav class="bottom">
+  <button data-view="resumen" class="active"><span class="dot"></span>Resumen</button>
+  <button data-view="propiedades"><span class="dot"></span>Propiedades</button>
+  <button data-view="inquilinos"><span class="dot"></span>Inquilinos</button>
+  <button data-view="rentas"><span class="dot"></span>Rentas</button>
+  <button data-view="gastos"><span class="dot"></span>Gastos</button>
+  <button data-view="millas"><span class="dot"></span>Millas</button>
+  <button data-view="horas"><span class="dot"></span>Horas</button>
+</nav>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+</div>
+
+<div id="solicitud-screen" style="display:none;">
+  <header class="top" style="justify-content:space-between;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs><linearGradient id="logoGradSol" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#173F38"/><stop offset="55%" stop-color="#2F8F73"/><stop offset="100%" stop-color="#3AA0A0"/>
+        </linearGradient></defs>
+        <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#logoGradSol)"/>
+        <path d="M50 18 L82 44 V80 H18 V44 Z" fill="none" stroke="#F4EFE3" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+        <rect x="39" y="50" width="22" height="30" rx="3" fill="#E3A63E"/>
+        <circle cx="50" cy="65" r="3.4" fill="#143530"/>
+      </svg>
+      <div>
+        <h1 data-i18n="title" style="font-size:18px;">Solicitud de Arrendamiento</h1>
+        <div class="sub" data-i18n="subtitle">Completa el formulario para aplicar</div>
+      </div>
+    </div>
+    <button id="langToggle" style="background:none; border:1px solid #F4EFE3; color:#F4EFE3; border-radius:20px; padding:6px 12px; font-size:12px; font-weight:700; cursor:pointer;">English</button>
+  </header>
+  <main style="max-width:520px;">
+    <p class="hint" data-i18n="intro" style="font-size:14px; margin-bottom:18px;"></p>
+    <p class="tag pending" data-i18n="noPets" style="display:inline-block; margin-bottom:18px;"></p>
+    <div class="card" id="verifyBox" style="display:none; margin-bottom:18px;">
+      <div class="item-name" data-i18n="verifyTitle" style="margin-bottom:4px;"></div>
+      <div class="item-meta" data-i18n="verifyDesc" style="margin-bottom:12px;"></div>
+      <a id="verifyBtn" href="#" target="_blank" rel="noopener" class="btn primary" style="display:block; text-align:center; text-decoration:none;" data-i18n="verifyBtnLabel"></a>
+    </div>
+
+    <form id="appForm">
+      <input type="checkbox" name="botcheck" style="position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
+
+      <div class="section-title" data-i18n="legend1"></div>
+      <div class="field"><label data-i18n="lblName"></label><input type="text" name="Nombre completo" required></div>
+      <div class="two-col">
+        <div class="field"><label data-i18n="lblPhone"></label><input type="tel" name="Teléfono" required></div>
+        <div class="field"><label data-i18n="lblEmail"></label><input type="email" name="Correo electrónico" required></div>
+      </div>
+      <div class="field"><label data-i18n="lblAddress"></label><input type="text" name="Dirección actual"></div>
+
+      <div class="section-title" data-i18n="legend2"></div>
+      <div class="field"><label data-i18n="lblPropertyInterest"></label><input type="text" name="Propiedad de interés"></div>
+      <div class="two-col">
+        <div class="field"><label data-i18n="lblMoveDate"></label><input type="date" name="Fecha deseada de mudanza"></div>
+        <div class="field"><label data-i18n="lblOccupants"></label><input type="number" min="1" name="Número de ocupantes"></div>
+      </div>
+
+      <div class="section-title" data-i18n="legend3"></div>
+      <div class="field"><label data-i18n="lblEmployer"></label><input type="text" name="Empleador u ocupación"></div>
+      <div class="field"><label data-i18n="lblIncome"></label><input type="text" name="Ingreso mensual aproximado" placeholder="$"></div>
+
+      <div class="section-title" data-i18n="legend4"></div>
+      <div class="field">
+        <label data-i18n="lblVehicle"></label>
+        <div style="display:flex; gap:16px; margin-top:4px;">
+          <label style="display:flex; align-items:center; gap:6px; font-weight:400;"><input type="radio" name="Tiene vehículo" value="Sí" style="width:auto;"> <span data-i18n="yes"></span></label>
+          <label style="display:flex; align-items:center; gap:6px; font-weight:400;"><input type="radio" name="Tiene vehículo" value="No" checked style="width:auto;"> <span data-i18n="no"></span></label>
+        </div>
+      </div>
+
+      <div class="section-title" data-i18n="legend5"></div>
+      <div class="two-col">
+        <div class="field"><label data-i18n="lblRefName"></label><input type="text" name="Nombre de referencia"></div>
+        <div class="field"><label data-i18n="lblRefPhone"></label><input type="tel" name="Teléfono de referencia"></div>
+      </div>
+
+      <div class="section-title" data-i18n="legend6"></div>
+      <div class="field"><label data-i18n="lblComments"></label><textarea name="Comentarios adicionales"></textarea></div>
+
+      <button type="submit" id="submitBtn" class="btn primary block" data-i18n="submit" style="width:100%;"></button>
+      <div class="msg" id="msgBox" style="padding:14px 16px; border-radius:10px; font-size:14px; margin-top:14px; display:none;"></div>
+    </form>
+  </main>
+</div>
+
+<div id="reporte-screen" style="display:none;">
+  <header class="top">
+    <svg width="36" height="36" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="logoGradRep" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#173F38"/><stop offset="55%" stop-color="#2F8F73"/><stop offset="100%" stop-color="#3AA0A0"/>
+      </linearGradient></defs>
+      <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#logoGradRep)"/>
+      <path d="M50 18 L82 44 V80 H18 V44 Z" fill="none" stroke="#F4EFE3" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+      <rect x="39" y="50" width="22" height="30" rx="3" fill="#E3A63E"/>
+      <circle cx="50" cy="65" r="3.4" fill="#143530"/>
+    </svg>
+    <div>
+      <h1 style="font-size:18px;">Reportar un problema</h1>
+      <div class="sub">Cuéntanos qué pasó y te contactaremos</div>
+    </div>
+  </header>
+  <main style="max-width:520px;">
+    <p class="hint" style="font-size:14px; margin-bottom:18px;">Usa este formulario para reportar cualquier problema de mantenimiento en tu unidad. Entre más detalle nos des, más rápido podemos resolverlo.</p>
+
+    <form id="reportForm">
+      <input type="hidden" name="access_key" value="438b2a5e-754c-49a8-821c-c039bc0aa715">
+      <input type="hidden" name="subject" value="Nuevo reporte de mantenimiento">
+      <input type="checkbox" name="botcheck" style="position:absolute; left:-9999px;" tabindex="-1" autocomplete="off">
+
+      <div class="field"><label>Tu nombre *</label><input type="text" name="Nombre del inquilino" required></div>
+      <div class="two-col">
+        <div class="field"><label>Teléfono de contacto *</label><input type="tel" name="Teléfono de contacto" required></div>
+        <div class="field"><label>Propiedad / unidad *</label><input type="text" name="Propiedad o unidad" required></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Tipo de problema</label>
+          <select name="Tipo de problema">
+            <option>Plomería</option>
+            <option>Eléctrico</option>
+            <option>Electrodoméstico</option>
+            <option>Calefacción / aire acondicionado</option>
+            <option>Estructural</option>
+            <option>Plagas</option>
+            <option>Otro</option>
+          </select>
+        </div>
+        <div class="field"><label>Urgencia</label>
+          <select name="Urgencia">
+            <option>Baja — puede esperar</option>
+            <option>Media — en los próximos días</option>
+            <option>Alta — urgente</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Describe el problema *</label><textarea name="Descripción del problema" required placeholder="¿Qué pasó? ¿Desde cuándo?"></textarea></div>
+      <div class="field"><label>Fotos (opcional)</label>
+        <div class="photo-upload">
+          <input type="file" accept="image/*" multiple name="Fotos del problema">
+          <div class="hint">Ayuda mucho ver el problema en fotos.</div>
+        </div>
+      </div>
+      <div class="field"><label>Link de video (opcional)</label><input type="url" name="Link de video" placeholder="Pega aquí un link de Google Fotos/Drive">
+        <div class="hint">Si grabaste un video, súbelo a Google Fotos o Drive y pega aquí el enlace — los videos no se pueden adjuntar directo por correo.</div>
+      </div>
+
+      <button type="submit" class="btn primary block" id="reportSubmitBtn" style="width:100%;">Enviar reporte</button>
+      <div class="msg" id="reportMsgBox" style="padding:14px 16px; border-radius:10px; font-size:14px; margin-top:14px; display:none;"></div>
+    </form>
+  </main>
+</div>
+
+<script>
+const STORAGE_PREFIX = 'gestorRentas_';
+const KEYS = ['properties','tenants','rents','expenses','mileage','hours'];
+let DB = { properties:[], tenants:[], rents:[], expenses:[], mileage:[], hours:[] };
+let currentView = 'resumen';
+let editing = null;
+let filterProp = 'all';
+let tempPhotos = [];
+let tempRoomPhotos = [];
+
+const $ = s => document.querySelector(s);
+const fmt$ = n => '$' + (Math.round((n||0)*100)/100).toLocaleString('es-ES',{minimumFractionDigits:2, maximumFractionDigits:2});
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const todayStr = () => new Date().toISOString().slice(0,10);
+const thisMonth = () => new Date().toISOString().slice(0,7);
+function esc(s){ return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function daysUntilPayDay(payDay){
+  if(!payDay) return null;
+  const now = new Date();
+  let target = new Date(now.getFullYear(), now.getMonth(), Number(payDay));
+  if(target < new Date(now.getFullYear(), now.getMonth(), now.getDate())) target = new Date(now.getFullYear(), now.getMonth()+1, Number(payDay));
+  const diff = Math.round((target - new Date(now.getFullYear(), now.getMonth(), now.getDate())) / (1000*60*60*24));
+  return {date:target, diff};
+}
+
+function readAndCompressImage(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w>h){ if(w>maxDim){ h = Math.round(h*maxDim/w); w = maxDim; } }
+        else { if(h>maxDim){ w = Math.round(w*maxDim/h); h = maxDim; } }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/* ---------- Storage (localStorage: works standalone, installed on phone) ---------- */
+async function loadAll(){
+  $('#headerSub').textContent = 'Cargando datos…';
+  for(const k of KEYS){
+    try{
+      const raw = localStorage.getItem(STORAGE_PREFIX+k);
+      DB[k] = raw ? JSON.parse(raw) : [];
+    }catch(e){ DB[k] = []; }
+  }
+  $('#headerSub').textContent = 'Tus propiedades, un solo lugar';
+  renderAll();
+}
+async function save(key){
+  try{
+    localStorage.setItem(STORAGE_PREFIX+key, JSON.stringify(DB[key]));
+  }catch(e){
+    console.error('storage error', e);
+    alert('No se pudo guardar. Puede que el almacenamiento esté lleno por muchas fotos. Intenta usar fotos más pequeñas o elimina alguna.');
+  }
+}
+
+function switchView(v){
+  currentView = v;
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  $('#view-'+v).classList.add('active');
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+}
+document.querySelectorAll('nav.bottom button').forEach(b=>b.addEventListener('click', ()=>switchView(b.dataset.view)));
+
+function renderAll(){
+  renderChipsAll();
+  renderResumen();
+  renderProperties();
+  renderTenants();
+  renderRents();
+  renderExpenses();
+  renderMileage();
+  renderHours();
+}
+
+/* ---------- Chips (filtro por propiedad) ---------- */
+function chipsHTML(){
+  return `<button class="chip ${filterProp==='all'?'active':''}" data-prop="all">Todas</button>` +
+    DB.properties.map(p=>`<button class="chip ${filterProp===p.id?'active':''}" data-prop="${p.id}">${esc(p.name)}</button>`).join('');
+}
+function renderChipsAll(){
+  ['chips-resumen','chips-inquilinos','chips-rentas','chips-gastos'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(el) el.innerHTML = DB.properties.length ? chipsHTML() : '';
+  });
+}
+document.addEventListener('click', (e)=>{
+  const chip = e.target.closest('.chip');
+  if(chip){ filterProp = chip.dataset.prop; renderAll(); }
+});
+
+/* ---------- RESUMEN ---------- */
+function renderResumen(){
+  const m = thisMonth();
+  const filteredTenants = filterProp==='all' ? DB.tenants : DB.tenants.filter(t=>t.propertyId===filterProp);
+  const tenantIds = filteredTenants.map(t=>t.id);
+  const filteredRents = DB.rents.filter(r=>tenantIds.includes(r.tenantId));
+  const filteredExpenses = filterProp==='all' ? DB.expenses : DB.expenses.filter(e=>e.propertyId===filterProp);
+
+  const rentMonth = filteredRents.filter(r=>r.date && r.date.startsWith(m)).reduce((s,r)=>s+Number(r.amountPaid||0),0);
+  const expMonth = filteredExpenses.filter(e=>e.date && e.date.startsWith(m)).reduce((s,e)=>s+Number(e.amount||0),0);
+  const milesMonth = DB.mileage.filter(x=>x.date && x.date.startsWith(m)).reduce((s,x)=>s+Number(x.miles||0),0);
+  const hoursMonth = DB.hours.filter(x=>x.date && x.date.startsWith(m)).reduce((s,x)=>s+Number(x.hours||0),0);
+
+  $('#statRentMonth').textContent = fmt$(rentMonth);
+  $('#statExpMonth').textContent = fmt$(expMonth);
+  const net = rentMonth-expMonth;
+  const netEl = $('#statNet');
+  netEl.textContent = fmt$(net);
+  netEl.classList.toggle('neg', net<0);
+  $('#statTenants').textContent = filteredTenants.length;
+  $('#statMiles').textContent = milesMonth;
+  $('#statHours').textContent = hoursMonth;
+
+  const upcoming = filteredTenants.map(t=>({t, info:daysUntilPayDay(t.payDay)})).filter(x=>x.info && x.info.diff<=7).sort((a,b)=>a.info.diff-b.info.diff);
+  const upEl = $('#upcomingList');
+  if(!upcoming.length){ upEl.innerHTML = '<div class="empty">No hay cobros programados en los próximos 7 días.</div>'; }
+  else{
+    upEl.innerHTML = upcoming.map(x=>`<div class="card row-item">
+      <div class="main"><div class="item-name">${esc(x.t.name)}</div><div class="item-meta">Cobra el día ${x.t.payDay} · ${x.info.diff===0?'hoy':'en '+x.info.diff+' día'+(x.info.diff===1?'':'s')}</div></div>
+      <div class="item-amount pos">${fmt$(x.t.rentAmount)}</div>
+    </div>`).join('');
+  }
+
+  const pend = filteredRents.filter(r=>Number(r.amountDue||0)-Number(r.amountPaid||0) > 0.001).sort((a,b)=>a.date<b.date?1:-1);
+  const list = $('#pendingList');
+  if(!pend.length){ list.innerHTML = '<div class="empty">No hay rentas pendientes.</div>'; return; }
+  list.innerHTML = pend.map(r=>{
+    const t = DB.tenants.find(t=>t.id===r.tenantId);
+    const balance = Number(r.amountDue||0)-Number(r.amountPaid||0);
+    const partial = Number(r.amountPaid||0) > 0;
+    return `<div class="card card-rose row-item" data-open="rentas:${r.id}">
+      <div class="main"><div class="item-name">${t?esc(t.name):'Inquilino eliminado'}</div><div class="item-meta">${r.date||''}${partial?' · abonó '+fmt$(r.amountPaid):''}</div></div>
+      <div class="item-amount neg">Debe ${fmt$(balance)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- PROPIEDADES ---------- */
+function renderProperties(){
+  const list = $('#propertiesList');
+  if(!DB.properties.length){ list.innerHTML = '<div class="empty">Aún no tienes propiedades. Toca + para agregar la primera.</div>'; return; }
+  list.innerHTML = DB.properties.map(p=>{
+    const tenantCount = DB.tenants.filter(t=>t.propertyId===p.id).length;
+    const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : []);
+    return `<div class="card card-blue property-card" data-open="propiedades:${p.id}">
+      ${photos.length?`<div style="position:relative;"><img class="photo-card-img" src="${photos[0]}" alt="">${photos.length>1?`<span class="photo-badge">${photos.length} fotos</span>`:''}</div>`:''}
+      <div class="body">
+        <div class="item-name">${esc(p.name)}</div>
+        <div class="item-meta">${esc(p.address||'Sin dirección')} · ${tenantCount} inquilino${tenantCount===1?'':'s'}</div>
+        ${p.videoLink?`<a href="${esc(p.videoLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="tag" style="margin-top:8px; text-decoration:none;">▶ Ver video</a>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- INQUILINOS ---------- */
+function renderTenants(){
+  const list = $('#tenantsList');
+  const items = filterProp==='all' ? DB.tenants : DB.tenants.filter(t=>t.propertyId===filterProp);
+  if(!items.length){ list.innerHTML = '<div class="empty">Aún no tienes inquilinos aquí. Toca + para agregar uno.</div>'; return; }
+  list.innerHTML = items.map(t=>{
+    const prop = DB.properties.find(p=>p.id===t.propertyId);
+    const roomPhotos = (t.roomPhotos && t.roomPhotos.length) ? t.roomPhotos : (t.roomPhoto ? [t.roomPhoto] : []);
+    return `<div class="card card-purple row-item" data-open="inquilinos:${t.id}">
+      ${roomPhotos.length?`<img class="thumb" src="${roomPhotos[0]}" alt="">`:''}
+      <div class="main">
+        <div class="item-name">${esc(t.name)}</div>
+        <div class="item-meta">${esc(t.room||'Sin habitación/unidad')}${prop?' · '+esc(prop.name):''}${t.phone?' · '+esc(t.phone):''}</div>
+        ${t.depositAmount?`<span class="tag ${t.depositReturned?'paid':'pending'}">Depósito ${fmt$(t.depositAmount)} · ${t.depositReturned?'Devuelto':'Pendiente'}</span>`:''}
+      </div>
+      <div class="item-amount pos">${fmt$(t.rentAmount)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- RENTAS ---------- */
+function renderRents(){
+  const list = $('#rentsList');
+  const tenantIds = filterProp==='all' ? null : DB.tenants.filter(t=>t.propertyId===filterProp).map(t=>t.id);
+  let items = tenantIds ? DB.rents.filter(r=>tenantIds.includes(r.tenantId)) : [...DB.rents];
+  items = [...items].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado pagos de renta.</div>'; return; }
+  list.innerHTML = items.map(r=>{
+    const t = DB.tenants.find(t=>t.id===r.tenantId);
+    const prop = t ? DB.properties.find(p=>p.id===t.propertyId) : null;
+    const due = Number(r.amountDue||0), paid = Number(r.amountPaid||0);
+    const balance = due - paid;
+    const status = balance<=0.001 ? 'pagado' : (paid>0 ? 'parcial' : 'pendiente');
+    const tagClass = status==='pagado'?'paid':(status==='parcial'?'partial':'pending');
+    const tagText = status==='pagado'?'Pagado':(status==='parcial'?'Parcial':'Pendiente');
+    return `<div class="card card-green row-item" data-open="rentas:${r.id}">
+      <div class="main">
+        <div class="item-name">${t?esc(t.name):'Inquilino eliminado'}</div>
+        <div class="item-meta">${r.date||''} · debía ${fmt$(due)}${prop?' · '+esc(prop.name):''}</div>
+        <span class="tag ${tagClass}">${tagText}</span>
+        ${balance>0.001?`<div class="balance-note">Debe ${fmt$(balance)}</div>`:''}
+      </div>
+      <div class="item-amount ${status==='pagado'?'pos':'neg'}">${fmt$(paid)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- GASTOS ---------- */
+function renderExpenses(){
+  const list = $('#expensesList');
+  const items = [...(filterProp==='all' ? DB.expenses : DB.expenses.filter(e=>e.propertyId===filterProp))].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado gastos aquí.</div>'; return; }
+  list.innerHTML = items.map(e=>{
+    const prop = DB.properties.find(p=>p.id===e.propertyId);
+    return `<div class="card card-rose row-item" data-open="gastos:${e.id}">
+      <div class="main">
+        <div class="item-name">${esc(e.description||e.category)}</div>
+        <div class="item-meta">${e.date||''} · ${esc(e.category||'')}${prop?' · '+esc(prop.name):' · General'}</div>
+      </div>
+      <div class="item-amount neg">${fmt$(e.amount)}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- MILLAS ---------- */
+function renderMileage(){
+  const list = $('#mileageList');
+  const items = [...DB.mileage].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  const total = items.reduce((s,x)=>s+Number(x.miles||0),0);
+  $('#milesTotal').textContent = total + ' mi · ' + fmt$(total*0.70);
+  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado millas.</div>'; return; }
+  list.innerHTML = items.map(x=>`
+    <div class="card card-indigo row-item" data-open="millas:${x.id}">
+      <div class="main"><div class="item-name">${esc(x.purpose||'Viaje de negocio')}</div><div class="item-meta">${x.date||''}</div></div>
+      <div class="item-amount pos">${x.miles||0} mi</div>
+    </div>`).join('');
+}
+
+/* ---------- HORAS ---------- */
+function renderHours(){
+  const list = $('#hoursList');
+  const items = [...DB.hours].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado horas.</div>'; return; }
+  list.innerHTML = items.map(x=>`
+    <div class="card card-amber row-item" data-open="horas:${x.id}">
+      <div class="main"><div class="item-name">${esc(x.task||'Trabajo del negocio')}</div><div class="item-meta">${x.date||''}</div></div>
+      <div class="item-amount pos">${x.hours||0} h</div>
+    </div>`).join('');
+}
+
+/* ---------- Click delegation: abrir edición ---------- */
+document.addEventListener('click', (e)=>{
+  const el = e.target.closest('[data-open]');
+  if(el){
+    const [type,id] = el.dataset.open.split(':');
+    openForm(type, id);
+  }
+});
+
+/* ---------- FAB ---------- */
+$('#fabAdd').addEventListener('click', ()=>{
+  const map = {resumen:'inquilinos', propiedades:'propiedades', inquilinos:'inquilinos', rentas:'rentas', gastos:'gastos', millas:'millas', horas:'horas'};
+  openForm(map[currentView], null);
+});
+
+/* ---------- Reporte para el contador ---------- */
+$('#btnReport').addEventListener('click', openReportSheet);
+
+$('#btnShareApp').addEventListener('click', async ()=>{
+  const link = location.origin + location.pathname + '?solicitud=1';
+  const text = 'Completa esta solicitud para aplicar a la renta:';
+  if(navigator.share){
+    try{ await navigator.share({title:'Solicitud de Arrendamiento', text, url:link}); }
+    catch(e){ /* usuario canceló, no hacer nada */ }
+  }else{
+    try{
+      await navigator.clipboard.writeText(link);
+      alert('Enlace copiado. Pégalo en WhatsApp, mensaje o correo:\n' + link);
+    }catch(e){
+      prompt('Copia este enlace para compartirlo:', link);
+    }
+  }
+});
+
+$('#btnShareReport').addEventListener('click', async ()=>{
+  const link = location.origin + location.pathname + '?reporte=1';
+  const text = 'Usa este enlace para reportar cualquier problema de mantenimiento en tu unidad:';
+  if(navigator.share){
+    try{ await navigator.share({title:'Reportar un problema', text, url:link}); }
+    catch(e){ /* usuario canceló, no hacer nada */ }
+  }else{
+    try{
+      await navigator.clipboard.writeText(link);
+      alert('Enlace copiado. Pégalo en WhatsApp, mensaje o correo:\n' + link);
+    }catch(e){
+      prompt('Copia este enlace para compartirlo:', link);
+    }
+  }
+});
+
+function initReporte(){
+  const form = document.getElementById('reportForm');
+  const btn = document.getElementById('reportSubmitBtn');
+  const msgBox = document.getElementById('reportMsgBox');
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    msgBox.style.display = 'none';
+    if(form.botcheck.checked) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando…';
+
+    try{
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method:'POST',
+        headers:{'Accept':'application/json'},
+        body: new FormData(form)
+      });
+      const result = await res.json();
+      if(result.success){
+        form.reset();
+        form.style.display = 'none';
+        msgBox.style.background = '#E4F0E9'; msgBox.style.color = '#3C6E52';
+        msgBox.textContent = '¡Listo! Tu reporte fue enviado. Te contactaremos pronto.';
+        msgBox.style.display = 'block';
+      }else{
+        throw new Error(result.message || 'error');
+      }
+    }catch(err){
+      msgBox.style.background = '#FBEAE7'; msgBox.style.color = '#B0453A';
+      msgBox.textContent = 'No se pudo enviar el reporte. Revisa tu conexión e intenta de nuevo.';
+      msgBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Enviar reporte';
+    }
+  });
+}
+
+function openReportSheet(){
+  const years = new Set([String(new Date().getFullYear())]);
+  [...DB.rents, ...DB.expenses, ...DB.mileage, ...DB.hours].forEach(x=>{ if(x.date) years.add(x.date.slice(0,4)); });
+  const yearList = [...years].sort().reverse();
+  $('#sheet').innerHTML = `
+    <h2>Reporte para tu contador</h2>
+    <div class="field"><label>Año</label><select id="rp_year">${yearList.map(y=>`<option value="${y}">${y}</option>`).join('')}</select></div>
+    <p class="hint">Incluye renta cobrada, gastos por categoría, millas y horas del año seleccionado, listo para descargar como CSV y compartir con tu contador.</p>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="btnCancel">Cancelar</button>
+      <button class="btn primary" id="btnDownloadReport">Descargar CSV</button>
+    </div>`;
+  $('#overlay').classList.add('open');
+}
+
+function csvEsc(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }
+
+function downloadReport(year){
+  const rows = [];
+  rows.push(['Reporte de impuestos', year]);
+  rows.push([]);
+  rows.push(['INGRESOS POR RENTA']);
+  rows.push(['Fecha','Inquilino','Propiedad','Monto debido','Monto pagado']);
+  let totalPaid = 0;
+  DB.rents.filter(r=>r.date && r.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
+    const t = DB.tenants.find(t=>t.id===r.tenantId);
+    const p = t ? DB.properties.find(p=>p.id===t.propertyId) : null;
+    totalPaid += Number(r.amountPaid||0);
+    rows.push([r.date, t?t.name:'', p?p.name:'', r.amountDue||0, r.amountPaid||0]);
+  });
+  rows.push(['Total cobrado','','','',totalPaid.toFixed(2)]);
+  rows.push([]);
+  rows.push(['GASTOS']);
+  rows.push(['Fecha','Categoría','Descripción','Propiedad','Monto']);
+  let totalExp = 0;
+  DB.expenses.filter(e=>e.date && e.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
+    const p = DB.properties.find(p=>p.id===e.propertyId);
+    totalExp += Number(e.amount||0);
+    rows.push([e.date, e.category||'', e.description||'', p?p.name:'General', e.amount||0]);
+  });
+  rows.push(['Total gastos','','','',totalExp.toFixed(2)]);
+  rows.push([]);
+  rows.push(['MILLAS']);
+  rows.push(['Fecha','Propósito','Millas']);
+  let totalMiles = 0;
+  DB.mileage.filter(x=>x.date && x.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
+    totalMiles += Number(x.miles||0);
+    rows.push([x.date, x.purpose||'', x.miles||0]);
+  });
+  rows.push(['Total millas','','',totalMiles]);
+  rows.push(['Deducción estimada (referencia $0.70/milla)','','',(totalMiles*0.70).toFixed(2)]);
+  rows.push([]);
+  rows.push(['HORAS']);
+  rows.push(['Fecha','Tarea','Horas']);
+  let totalHours = 0;
+  DB.hours.filter(x=>x.date && x.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
+    totalHours += Number(x.hours||0);
+    rows.push([x.date, x.task||'', x.hours||0]);
+  });
+  rows.push(['Total horas','','',totalHours]);
+  rows.push([]);
+  rows.push(['RESUMEN']);
+  rows.push(['Total renta cobrada', totalPaid.toFixed(2)]);
+  rows.push(['Total gastos', totalExp.toFixed(2)]);
+  rows.push(['Ganancia neta', (totalPaid-totalExp).toFixed(2)]);
+
+  const csv = rows.map(r=>r.map(csvEsc).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'reporte-impuestos-' + year + '.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+}
+
+/* ---------- Forms ---------- */
+function openForm(type, id){
+  editing = {type, id};
+  const item = id ? DB[typeKey(type)].find(x=>x.id===id) : null;
+  $('#sheet').innerHTML = formHTML(type, item);
+  $('#overlay').classList.add('open');
+  const first = $('#sheet').querySelector('input,select,textarea');
+  if(first) setTimeout(()=>first.focus(), 50);
+
+  if(type==='rentas'){
+    const tenantSel = document.getElementById('f_tenantId');
+    const dueEl = document.getElementById('f_amountDue');
+    const paidEl = document.getElementById('f_amountPaid');
+    const preview = document.getElementById('balancePreview');
+    if(!item){
+      tenantSel.addEventListener('change', ()=>{
+        const t = DB.tenants.find(t=>t.id===tenantSel.value);
+        if(t && !dueEl.value) dueEl.value = t.rentAmount || '';
+        if(t && !paidEl.value) paidEl.value = t.rentAmount || '';
+      });
+    }
+    const updatePreview = ()=>{
+      const bal = (Number(dueEl.value)||0) - (Number(paidEl.value)||0);
+      preview.textContent = bal>0.001 ? ('Quedará debiendo ' + fmt$(bal) + '.') : 'Quedará pagado por completo.';
+    };
+    dueEl.addEventListener('input', updatePreview);
+    paidEl.addEventListener('input', updatePreview);
+    updatePreview();
+  }
+
+  if(type==='propiedades'){
+    tempPhotos = (item?.photos && item.photos.length) ? [...item.photos] : (item?.photo ? [item.photo] : []);
+    renderPropPhotoGrid();
+    document.getElementById('f_photoFiles').addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      for(const f of files){
+        try{ tempPhotos.push(await readAndCompressImage(f, 1000, 0.75)); }
+        catch(err){ alert('No se pudo procesar una imagen.'); }
+      }
+      renderPropPhotoGrid();
+      e.target.value = '';
+    });
+  }
+
+  if(type==='inquilinos'){
+    const leaseTypeSel = document.getElementById('f_leaseType');
+    const leaseEndWrap = document.getElementById('leaseEndWrap');
+    leaseTypeSel.addEventListener('change', ()=>{
+      leaseEndWrap.style.display = leaseTypeSel.value==='fijo' ? 'block' : 'none';
+      if(leaseTypeSel.value==='mensual') document.getElementById('f_leaseEnd').value = '';
+    });
+    const depReturnedChk = document.getElementById('f_depositReturned');
+    const depReturnWrap = document.getElementById('depositReturnWrap');
+    depReturnedChk.addEventListener('change', ()=>{
+      depReturnWrap.style.display = depReturnedChk.checked ? 'grid' : 'none';
+      const amtEl = document.getElementById('f_depositReturnAmount');
+      const depAmt = document.getElementById('f_depositAmount').value;
+      if(depReturnedChk.checked && !amtEl.value) amtEl.value = depAmt;
+    });
+    tempRoomPhotos = (item?.roomPhotos && item.roomPhotos.length) ? [...item.roomPhotos] : (item?.roomPhoto ? [item.roomPhoto] : []);
+    renderRoomPhotoGrid();
+    document.getElementById('f_roomPhotoFiles').addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      for(const f of files){
+        try{ tempRoomPhotos.push(await readAndCompressImage(f, 900, 0.72)); }
+        catch(err){ alert('No se pudo procesar una imagen.'); }
+      }
+      renderRoomPhotoGrid();
+      e.target.value = '';
+    });
+  }
+}
+function renderPropPhotoGrid(){
+  const grid = document.getElementById('photoGrid');
+  if(!grid) return;
+  grid.innerHTML = tempPhotos.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rmphoto="${i}">×</button></div>`).join('');
+}
+function renderRoomPhotoGrid(){
+  const grid = document.getElementById('roomPhotoGrid');
+  if(!grid) return;
+  grid.innerHTML = tempRoomPhotos.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rmroomphoto="${i}">×</button></div>`).join('');
+}
+function closeForm(){
+  $('#overlay').classList.remove('open');
+  editing = null;
+  tempPhotos = [];
+  tempRoomPhotos = [];
+}
+$('#overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeForm(); });
+
+function typeKey(type){
+  return {propiedades:'properties', inquilinos:'tenants', rentas:'rents', gastos:'expenses', millas:'mileage', horas:'hours'}[type];
+}
+function tenantOptions(selectedId){
+  return DB.tenants.map(t=>`<option value="${t.id}" ${t.id===selectedId?'selected':''}>${esc(t.name)}</option>`).join('');
+}
+function propertyOptions(selectedId, emptyLabel){
+  const emptyOpt = `<option value="" ${!selectedId?'selected':''}>${emptyLabel}</option>`;
+  return emptyOpt + DB.properties.map(p=>`<option value="${p.id}" ${p.id===selectedId?'selected':''}>${esc(p.name)}</option>`).join('');
+}
+
+function formHTML(type, item){
+  const titles = {propiedades:'Propiedad', inquilinos:'Inquilino', rentas:'Pago de renta', gastos:'Gasto', millas:'Millas', horas:'Horas'};
+  const isEdit = !!item;
+  let fields = '';
+
+  if(type==='propiedades'){
+    fields = `
+      <div class="field"><label>Nombre de la propiedad</label><input id="f_name" value="${esc(item?.name||'')}" placeholder="Casa Roble"></div>
+      <div class="field"><label>Dirección</label><input id="f_address" value="${esc(item?.address||'')}" placeholder="Calle, ciudad"></div>
+      <div class="field"><label>Fotos de la propiedad</label>
+        <div class="photo-upload">
+          <input type="file" accept="image/*" multiple id="f_photoFiles">
+          <div class="hint">Puedes elegir varias a la vez: sala, cocina, fachada, etc.</div>
+          <div class="photo-grid" id="photoGrid"></div>
+        </div>
+      </div>
+      <div class="field"><label>Link de video (opcional)</label><input id="f_videoLink" type="url" value="${esc(item?.videoLink||'')}" placeholder="Pega aquí un link de YouTube o Google Drive">
+        <div class="hint">Sube el video como "no listado" a YouTube o compártelo desde Google Drive/Fotos, y pega aquí el enlace.</div>
+      </div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
+  }
+  if(type==='inquilinos'){
+    fields = `
+      <div class="field"><label>Nombre</label><input id="f_name" value="${esc(item?.name||'')}" placeholder="Ej. Ana Torres"></div>
+      <div class="field"><label>Propiedad</label><select id="f_propertyId">${propertyOptions(item?.propertyId, 'Sin propiedad asignada')}</select></div>
+      <div class="two-col">
+        <div class="field"><label>Habitación / unidad</label><input id="f_room" value="${esc(item?.room||'')}" placeholder="Habitación 2"></div>
+        <div class="field"><label>Renta mensual</label><input id="f_rentAmount" type="number" step="0.01" value="${item?.rentAmount||''}" placeholder="1200"></div>
+      </div>
+      <div class="field"><label>Fotos de la habitación</label>
+        <div class="photo-upload">
+          <input type="file" accept="image/*" multiple id="f_roomPhotoFiles">
+          <div class="hint">Puedes elegir varias a la vez.</div>
+          <div class="photo-grid" id="roomPhotoGrid"></div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Teléfono</label><input id="f_phone" value="${esc(item?.phone||'')}" placeholder="(555) 555-5555"></div>
+        <div class="field"><label>Día de cobro (1-31)</label><input id="f_payDay" type="number" min="1" max="31" value="${item?.payDay||''}" placeholder="1"></div>
+      </div>
+      <div class="field"><label>Email</label><input id="f_email" value="${esc(item?.email||'')}" placeholder="correo@ejemplo.com"></div>
+      <div class="field"><label>Tipo de contrato</label>
+        <select id="f_leaseType">
+          <option value="mensual" ${(!item||item?.leaseType==='mensual')?'selected':''}>Mes a mes</option>
+          <option value="fijo" ${item?.leaseType==='fijo'?'selected':''}>Plazo fijo</option>
+        </select>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Inicio de contrato</label><input id="f_leaseStart" type="date" value="${item?.leaseStart||''}"></div>
+        <div class="field" id="leaseEndWrap" style="${(!item||item?.leaseType==='mensual')?'display:none;':''}"><label>Fin de contrato</label><input id="f_leaseEnd" type="date" value="${item?.leaseEnd||''}"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Depósito recibido</label><input id="f_depositAmount" type="number" step="0.01" value="${item?.depositAmount||''}" placeholder="500"></div>
+        <div class="field"><label>Fecha del depósito</label><input id="f_depositDate" type="date" value="${item?.depositDate||''}"></div>
+      </div>
+      <div class="field">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="f_depositReturned" style="width:auto;" ${item?.depositReturned?'checked':''}> Depósito devuelto
+        </label>
+      </div>
+      <div class="two-col" id="depositReturnWrap" style="${item?.depositReturned?'':'display:none;'}">
+        <div class="field"><label>Fecha de devolución</label><input id="f_depositReturnDate" type="date" value="${item?.depositReturnDate||''}"></div>
+        <div class="field"><label>Monto devuelto</label><input id="f_depositReturnAmount" type="number" step="0.01" value="${item?.depositReturnAmount??''}" placeholder="500"></div>
+      </div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas adicionales">${esc(item?.notes||'')}</textarea></div>`;
+  }
+  if(type==='rentas'){
+    const due = item?.amountDue ?? '';
+    const paid = item?.amountPaid ?? '';
+    fields = `
+      <div class="field"><label>Inquilino</label><select id="f_tenantId"><option value="">Selecciona…</option>${tenantOptions(item?.tenantId)}</select></div>
+      <div class="two-col">
+        <div class="field"><label>Fecha</label><input id="f_date" type="date" value="${item?.date||todayStr()}"></div>
+        <div class="field"><label>Monto que debía</label><input id="f_amountDue" type="number" step="0.01" value="${due}" placeholder="1200"></div>
+      </div>
+      <div class="field"><label>Monto que pagó</label><input id="f_amountPaid" type="number" step="0.01" value="${paid}" placeholder="Ej. 800 si solo abonó parte"></div>
+      <div class="field"><label>Método</label>
+        <select id="f_method">
+          ${['Transferencia','Efectivo','Cheque','Zelle/Venmo','Otro'].map(m=>`<option ${item?.method===m?'selected':''}>${m}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>
+      <div class="hint" id="balancePreview"></div>`;
+  }
+  if(type==='gastos'){
+    fields = `
+      <div class="two-col">
+        <div class="field"><label>Fecha</label><input id="f_date" type="date" value="${item?.date||todayStr()}"></div>
+        <div class="field"><label>Monto</label><input id="f_amount" type="number" step="0.01" value="${item?.amount||''}" placeholder="150"></div>
+      </div>
+      <div class="field"><label>Categoría</label>
+        <select id="f_category">
+          ${['Mantenimiento','Servicios (utilities)','Seguro','Impuestos','Reparaciones','Materiales','Otro'].map(c=>`<option ${item?.category===c?'selected':''}>${c}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Descripción</label><input id="f_description" value="${esc(item?.description||'')}" placeholder="Ej. Reparación de plomería"></div>
+      <div class="field"><label>Propiedad</label><select id="f_propertyId">${propertyOptions(item?.propertyId, 'General (todas)')}</select></div>`;
+  }
+  if(type==='millas'){
+    fields = `
+      <div class="two-col">
+        <div class="field"><label>Fecha</label><input id="f_date" type="date" value="${item?.date||todayStr()}"></div>
+        <div class="field"><label>Millas</label><input id="f_miles" type="number" step="0.1" value="${item?.miles||''}" placeholder="12.5"></div>
+      </div>
+      <div class="field"><label>Propósito / destino</label><input id="f_purpose" value="${esc(item?.purpose||'')}" placeholder="Ferretería, visita a propiedad…"></div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
+  }
+  if(type==='horas'){
+    fields = `
+      <div class="two-col">
+        <div class="field"><label>Fecha</label><input id="f_date" type="date" value="${item?.date||todayStr()}"></div>
+        <div class="field"><label>Horas</label><input id="f_hours" type="number" step="0.25" value="${item?.hours||''}" placeholder="2.5"></div>
+      </div>
+      <div class="field"><label>Tarea / actividad</label><input id="f_task" value="${esc(item?.task||'')}" placeholder="Mantenimiento, papeleo, mostrar unidad…"></div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
+  }
+
+  return `
+    <h2>${isEdit?'Editar':'Agregar'} ${titles[type]}</h2>
+    ${fields}
+    <div class="sheet-actions">
+      ${isEdit?'<button class="btn danger" id="btnDelete">Eliminar</button>':''}
+      <button class="btn ghost" id="btnCancel">Cancelar</button>
+      <button class="btn primary" id="btnSave">Guardar</button>
+    </div>`;
+}
+
+document.addEventListener('click', async (e)=>{
+  if(e.target.id==='btnCancel'){ closeForm(); }
+  if(e.target.id==='btnSave'){ await handleSave(); }
+  if(e.target.id==='btnDelete'){ await handleDelete(); }
+  if(e.target.id==='btnDownloadReport'){
+    const year = document.getElementById('rp_year').value;
+    downloadReport(year);
+    closeForm();
+  }
+  if(e.target.dataset.rmphoto !== undefined){
+    tempPhotos.splice(Number(e.target.dataset.rmphoto), 1);
+    renderPropPhotoGrid();
+  }
+  if(e.target.dataset.rmroomphoto !== undefined){
+    tempRoomPhotos.splice(Number(e.target.dataset.rmroomphoto), 1);
+    renderRoomPhotoGrid();
+  }
+});
+
+async function handleSave(){
+  const {type, id} = editing;
+  const key = typeKey(type);
+  const v = sel => { const el = document.getElementById(sel); return el ? el.value : ''; };
+  let data = {};
+
+  if(type==='propiedades'){
+    data = {name:v('f_name'), address:v('f_address'), photos:tempPhotos, videoLink:v('f_videoLink'), notes:v('f_notes')};
+    if(!data.name.trim()){ alert('Escribe un nombre para la propiedad.'); return; }
+  }
+  if(type==='inquilinos'){
+    const leaseType = v('f_leaseType') || 'mensual';
+    const depositReturned = document.getElementById('f_depositReturned').checked;
+    data = {name:v('f_name'), propertyId:v('f_propertyId'), room:v('f_room'), roomPhotos:tempRoomPhotos, rentAmount:Number(v('f_rentAmount'))||0, payDay:v('f_payDay')?Number(v('f_payDay')):null, phone:v('f_phone'), email:v('f_email'), leaseType, leaseStart:v('f_leaseStart'), leaseEnd:leaseType==='fijo'?v('f_leaseEnd'):'', depositAmount:Number(v('f_depositAmount'))||0, depositDate:v('f_depositDate'), depositReturned, depositReturnDate:depositReturned?v('f_depositReturnDate'):'', depositReturnAmount:depositReturned?(Number(v('f_depositReturnAmount'))||0):null, notes:v('f_notes')};
+    if(!data.name.trim()){ alert('Escribe un nombre.'); return; }
+  }
+  if(type==='rentas'){
+    data = {tenantId:v('f_tenantId'), date:v('f_date'), amountDue:Number(v('f_amountDue'))||0, amountPaid:Number(v('f_amountPaid'))||0, method:v('f_method'), notes:v('f_notes')};
+    if(!data.tenantId){ alert('Selecciona un inquilino.'); return; }
+  }
+  if(type==='gastos'){
+    data = {date:v('f_date'), amount:Number(v('f_amount'))||0, category:v('f_category'), description:v('f_description'), propertyId:v('f_propertyId')};
+  }
+  if(type==='millas'){
+    data = {date:v('f_date'), miles:Number(v('f_miles'))||0, purpose:v('f_purpose'), notes:v('f_notes')};
+  }
+  if(type==='horas'){
+    data = {date:v('f_date'), hours:Number(v('f_hours'))||0, task:v('f_task'), notes:v('f_notes')};
+  }
+
+  if(id){
+    const idx = DB[key].findIndex(x=>x.id===id);
+    DB[key][idx] = {...DB[key][idx], ...data};
+  }else{
+    DB[key].push({id:uid(), ...data});
+  }
+  await save(key);
+  closeForm();
+  renderAll();
+}
+
+async function handleDelete(){
+  const {type, id} = editing;
+  const key = typeKey(type);
+  if(!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+  DB[key] = DB[key].filter(x=>x.id!==id);
+  await save(key);
+  closeForm();
+  renderAll();
+}
+
+/* ---------- Pantalla pública de solicitud (idioma + envío) ---------- */
+// Pega aquí tu link de referido de Certn / SmartMove / RentPrep cuando lo tengas.
+// Mientras esté vacío, la sección de verificación se queda oculta.
+const VERIFICATION_LINK = '';
+
+const I18N = {
+  es: {
+    title:'Solicitud de Arrendamiento', subtitle:'Completa el formulario para aplicar',
+    intro:'Llena tus datos con la mayor precisión posible. Te contactaremos en cuanto revisemos tu solicitud.',
+    noPets:'Esta propiedad no acepta mascotas.',
+    verifyTitle:'Verificación de antecedentes y crédito (opcional)',
+    verifyDesc:'Puedes acelerar tu solicitud verificando tu historial crediticio y de antecedentes a través de nuestro socio de confianza. El costo lo cubres tú directamente con ellos.',
+    verifyBtnLabel:'Verificar mi historial',
+    legend1:'Datos personales', lblName:'Nombre completo *', lblPhone:'Teléfono *', lblEmail:'Correo electrónico *', lblAddress:'Dirección actual',
+    legend2:'Sobre la renta', lblPropertyInterest:'Propiedad o unidad de interés', lblMoveDate:'Fecha deseada de mudanza', lblOccupants:'Número de ocupantes',
+    legend3:'Situación laboral', lblEmployer:'Empleador / ocupación', lblIncome:'Ingreso mensual aproximado',
+    legend4:'Vehículo', lblVehicle:'¿Tiene vehículo?', yes:'Sí', no:'No',
+    legend5:'Referencia', lblRefName:'Nombre de referencia', lblRefPhone:'Teléfono de referencia',
+    legend6:'Comentarios', lblComments:'¿Algo más que quieras contarnos?',
+    submit:'Enviar solicitud', sending:'Enviando…',
+    success:'¡Listo! Tu solicitud fue enviada. Te contactaremos pronto.',
+    error:'No se pudo enviar la solicitud. Intenta de nuevo o contáctanos directamente.',
+    toggleLabel:'English'
+  },
+  en: {
+    title:'Rental Application', subtitle:'Fill out the form to apply',
+    intro:'Please fill in your information as accurately as possible. We will contact you once we review your application.',
+    noPets:'This property does not accept pets.',
+    verifyTitle:'Background & credit check (optional)',
+    verifyDesc:'You can speed up your application by verifying your credit and background history through our trusted partner. The cost is paid directly by you to them.',
+    verifyBtnLabel:'Verify my history',
+    legend1:'Personal information', lblName:'Full name *', lblPhone:'Phone *', lblEmail:'Email address *', lblAddress:'Current address',
+    legend2:'About the rental', lblPropertyInterest:'Property or unit of interest', lblMoveDate:'Desired move-in date', lblOccupants:'Number of occupants',
+    legend3:'Employment', lblEmployer:'Employer / occupation', lblIncome:'Approximate monthly income',
+    legend4:'Vehicle', lblVehicle:'Do you have a vehicle?', yes:'Yes', no:'No',
+    legend5:'Reference', lblRefName:'Reference name', lblRefPhone:'Reference phone',
+    legend6:'Comments', lblComments:'Anything else you would like us to know?',
+    submit:'Submit application', sending:'Sending…',
+    success:'Done! Your application has been sent. We will contact you soon.',
+    error:'Could not send the application. Please try again or contact us directly.',
+    toggleLabel:'Español'
+  }
+};
+let currentLang = 'es';
+function setLang(lang){
+  currentLang = lang;
+  const dict = I18N[lang];
+  document.querySelectorAll('#solicitud-screen [data-i18n]').forEach(el=>{
+    el.textContent = dict[el.dataset.i18n];
+  });
+  document.getElementById('langToggle').textContent = dict.toggleLabel;
+  document.documentElement.lang = lang;
+}
+document.getElementById('langToggle')?.addEventListener('click', ()=>{
+  setLang(currentLang==='es' ? 'en' : 'es');
+});
+
+function initSolicitud(){
+  setLang('es');
+  if(VERIFICATION_LINK){
+    document.getElementById('verifyBox').style.display = 'block';
+    document.getElementById('verifyBtn').href = VERIFICATION_LINK;
+  }
+  const form = document.getElementById('appForm');
+  const btn = document.getElementById('submitBtn');
+  const msgBox = document.getElementById('msgBox');
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    msgBox.style.display = 'none';
+    if(form.botcheck.checked) return;
+
+    const formData = new FormData(form);
+    const data = {};
+    formData.forEach((value, key)=>{ if(key!=='botcheck') data[key] = value; });
+    data.access_key = '438b2a5e-754c-49a8-821c-c039bc0aa715';
+    data.subject = 'Nueva solicitud de arrendamiento';
+    data.from_name = data['Nombre completo'] || 'Solicitante';
+
+    btn.disabled = true;
+    btn.textContent = I18N[currentLang].sending;
+
+    try{
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if(result.success){
+        form.reset();
+        form.style.display = 'none';
+        msgBox.style.background = '#E4F0E9'; msgBox.style.color = '#3C6E52';
+        msgBox.textContent = I18N[currentLang].success;
+        msgBox.style.display = 'block';
+      }else{
+        throw new Error(result.message || 'error');
+      }
+    }catch(err){
+      msgBox.style.background = '#FBEAE7'; msgBox.style.color = '#B0453A';
+      msgBox.textContent = I18N[currentLang].error;
+      msgBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = I18N[currentLang].submit;
+    }
+  });
+}
+
+/* ---------- Huella / Face ID (WebAuthn, requiere https) ---------- */
+async function bioAvailable(){
+  try{
+    return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable());
+  }catch(e){ return false; }
+}
+function b64(buf){ return btoa(String.fromCharCode(...new Uint8Array(buf))); }
+function unb64(str){ return Uint8Array.from(atob(str), c=>c.charCodeAt(0)); }
+
+async function registerBiometric(){
+  if(location.protocol !== 'https:'){
+    alert('La huella/Face ID solo funciona una vez que la app esté publicada en una dirección https:// real. Por ahora sigue usando tu usuario y contraseña.');
+    return;
+  }
+  const available = await bioAvailable();
+  if(!available){ alert('Este dispositivo no tiene huella o Face ID disponible en el navegador.'); return; }
+  try{
+    const cred = await navigator.credentials.create({publicKey:{
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rp: { name: 'Gestor de Rentas' },
+      user: { id: crypto.getRandomValues(new Uint8Array(16)), name: 'landlord', displayName: 'Landlord' },
+      pubKeyCredParams: [{type:'public-key', alg:-7}, {type:'public-key', alg:-257}],
+      authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required' },
+      timeout: 60000
+    }});
+    localStorage.setItem('gestorRentas_bioCredId', b64(cred.rawId));
+    alert('Listo. Ya puedes entrar con huella o Face ID la próxima vez.');
+    document.getElementById('btnEnableBio').textContent = 'Huella / Face ID activada ✓';
+  }catch(e){
+    alert('No se pudo activar. Intenta de nuevo o sigue usando tu contraseña.');
+  }
+}
+async function loginWithBiometric(){
+  const credId = localStorage.getItem('gestorRentas_bioCredId');
+  if(!credId) return false;
+  try{
+    await navigator.credentials.get({publicKey:{
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ id: unb64(credId), type:'public-key' }],
+      userVerification: 'required',
+      timeout: 60000
+    }});
+    return true;
+  }catch(e){ return false; }
+}
+document.getElementById('btnEnableBio')?.addEventListener('click', registerBiometric);
+
+/* ---------- Acceso con usuario y contraseña (candado local del dispositivo) ---------- */
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function getAuth(){
+  try{ return JSON.parse(localStorage.getItem('gestorRentas_auth')); }catch(e){ return null; }
+}
+function showApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  loadAll();
+}
+function initLogin(){
+  const auth = getAuth();
+  const isSetup = !auth;
+  document.getElementById('loginSubtitle').textContent = isSetup ? 'Crea tu usuario y contraseña' : 'Ingresa para continuar';
+  document.getElementById('li_confirmWrap').style.display = isSetup ? 'block' : 'none';
+  document.getElementById('linkForgot').style.display = isSetup ? 'none' : 'inline';
+  if(!isSetup) document.getElementById('li_user').value = auth.user;
+
+  const bioBtn = document.getElementById('btnBioLogin');
+  const bioCredId = localStorage.getItem('gestorRentas_bioCredId');
+  if(!isSetup && bioCredId){
+    bioAvailable().then(avail=>{
+      if(avail){
+        bioBtn.style.display = 'block';
+        bioBtn.onclick = async ()=>{
+          const ok = await loginWithBiometric();
+          if(ok){
+            sessionStorage.setItem('gestorRentas_unlocked', '1');
+            showApp();
+          }else{
+            alert('No se pudo verificar. Usa tu usuario y contraseña.');
+          }
+        };
+      }
+    });
+  }else{
+    bioBtn.style.display = 'none';
+  }
+
+  document.getElementById('btnLogin').onclick = async ()=>{
+    const errEl = document.getElementById('loginError');
+    errEl.style.display = 'none';
+    const user = document.getElementById('li_user').value.trim();
+    const pass = document.getElementById('li_pass').value;
+    if(!user || !pass){ errEl.textContent = 'Completa usuario y contraseña.'; errEl.style.display='block'; return; }
+
+    if(isSetup){
+      const pass2 = document.getElementById('li_pass2').value;
+      if(pass !== pass2){ errEl.textContent = 'Las contraseñas no coinciden.'; errEl.style.display='block'; return; }
+      const passHash = await sha256(pass);
+      localStorage.setItem('gestorRentas_auth', JSON.stringify({user, passHash}));
+      sessionStorage.setItem('gestorRentas_unlocked', '1');
+      showApp();
+    }else{
+      const passHash = await sha256(pass);
+      if(user === auth.user && passHash === auth.passHash){
+        sessionStorage.setItem('gestorRentas_unlocked', '1');
+        showApp();
+      }else{
+        errEl.textContent = 'Usuario o contraseña incorrectos.'; errEl.style.display = 'block';
+      }
+    }
+  };
+
+  document.getElementById('linkForgot').addEventListener('click', (e)=>{
+    e.preventDefault();
+    if(confirm('Esto borra tu usuario y contraseña actuales (tus propiedades, inquilinos y datos NO se borran). Tendrás que crear un acceso nuevo. ¿Continuar?')){
+      localStorage.removeItem('gestorRentas_auth');
+      sessionStorage.removeItem('gestorRentas_unlocked');
+      initLogin();
+    }
+  });
+}
+document.getElementById('btnLogout')?.addEventListener('click', ()=>{
+  sessionStorage.removeItem('gestorRentas_unlocked');
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  initLogin();
+});
+
+/* ---------- Punto de entrada: app privada (con login) o solicitud pública según la URL ---------- */
+const urlParams = new URLSearchParams(location.search);
+if(urlParams.get('solicitud') === '1'){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('solicitud-screen').style.display = 'block';
+  initSolicitud();
+}else if(urlParams.get('reporte') === '1'){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('reporte-screen').style.display = 'block';
+  initReporte();
+}else if(sessionStorage.getItem('gestorRentas_unlocked') === '1'){
+  showApp();
+}else{
+  initLogin();
+}
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('service-worker.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
