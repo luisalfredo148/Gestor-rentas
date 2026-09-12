@@ -21,12 +21,12 @@
     --teal-dark: #143530;
     --gold: #B8862E;
     --red: #B0453A;
-    --green-soft: #3C6E52;
-    --blue: #2F6FA8;
-    --purple: #7B4FA0;
-    --rose: #B0455D;
-    --indigo: #4B4FA5;
-    --amber: #C08A28;
+    --green-soft: #1E9E5A;
+    --blue: #1D6FD6;
+    --purple: #8B3FD1;
+    --rose: #E23F62;
+    --indigo: #5B4FE0;
+    --amber: #E8A227;
     --radius: 14px;
     --nav-h: 66px;
   }
@@ -40,10 +40,16 @@
   }
   header.top{
     position:sticky; top:0; z-index:20;
-    background:var(--teal); color:#F4EFE3;
+    background:linear-gradient(135deg, #173F38 0%, #2F8F73 65%, #3AA0A0 100%); color:#F4EFE3;
     padding:14px 18px; border-bottom:3px solid var(--gold);
-    display:flex; align-items:center; gap:12px;
+    display:flex; align-items:center; gap:12px; justify-content:space-between;
   }
+  header.top .brand-group{display:flex; align-items:center; gap:12px;}
+  header.top .icon-btn{
+    background:rgba(244,239,227,.15); border:1px solid rgba(244,239,227,.4); color:#F4EFE3;
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  header.top .icon-btn svg{width:19px; height:19px;}
   header.top .logo{flex:0 0 auto;}
   header.top h1{
     font-family:Georgia,'Times New Roman',serif;
@@ -104,16 +110,22 @@
   .card-indigo{border-left:4px solid var(--indigo);}
   .card-amber{border-left:4px solid var(--amber);}
   .stat-icon{
-    width:34px; height:34px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+    width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center;
     margin-bottom:8px;
   }
-  .stat-icon svg{width:18px; height:18px;}
-  .stat-icon.bg-green{background:#E4F0E9; color:var(--green-soft);}
-  .stat-icon.bg-rose{background:#F7E3E7; color:var(--rose);}
-  .stat-icon.bg-teal{background:#DCEAE7; color:var(--teal-dark);}
-  .stat-icon.bg-purple{background:#EBE2F2; color:var(--purple);}
-  .stat-icon.bg-indigo{background:#E3E4F5; color:var(--indigo);}
-  .stat-icon.bg-amber{background:#F6E7D8; color:var(--amber);}
+  .stat-icon svg{width:19px; height:19px;}
+  .stat-icon.solid-green{background:var(--green-soft); color:#fff;}
+  .stat-icon.solid-rose{background:var(--rose); color:#fff;}
+  .stat-icon.solid-teal{background:var(--teal); color:#fff;}
+  .stat-icon.solid-purple{background:var(--purple); color:#fff;}
+  .stat-icon.solid-indigo{background:var(--indigo); color:#fff;}
+  .stat-icon.solid-amber{background:var(--amber); color:#fff;}
+  .stat.tint-green{background:#E9F7EF; border-color:#BFE6CE;}
+  .stat.tint-rose{background:#FDEBEF; border-color:#F3C4D0;}
+  .stat.tint-teal{background:#E2F1ED; border-color:#BFE0D5;}
+  .stat.tint-purple{background:#F1E8FA; border-color:#DCC2F0;}
+  .stat.tint-indigo{background:#EAEAFB; border-color:#C9C9F5;}
+  .stat.tint-amber{background:#FCF1DD; border-color:#F0D49A;}
   .row-item{display:flex; align-items:center; justify-content:space-between; gap:10px;}
   .row-item .main{flex:1; min-width:0;}
   .item-name{font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -158,6 +170,7 @@
   nav.bottom button[data-view="gastos"].active .dot{background:var(--rose);}
   nav.bottom button[data-view="millas"].active .dot{background:var(--indigo);}
   nav.bottom button[data-view="horas"].active .dot{background:var(--amber);}
+  nav.bottom button[data-view="ajustes"].active .dot{background:var(--ink-soft);}
 
   /* Floating add button */
   .fab{
@@ -235,19 +248,24 @@
 
 <div id="app-screen" style="display:none;">
 <header class="top">
-  <svg class="logo" viewBox="0 0 100 100" width="38" height="38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs><linearGradient id="logoGradTop" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#173F38"/><stop offset="55%" stop-color="#2F8F73"/><stop offset="100%" stop-color="#3AA0A0"/>
-    </linearGradient></defs>
-    <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#logoGradTop)"/>
-    <path d="M50 18 L82 44 V80 H18 V44 Z" fill="none" stroke="#F4EFE3" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
-    <rect x="39" y="50" width="22" height="30" rx="3" fill="#E3A63E"/>
-    <circle cx="50" cy="65" r="3.4" fill="#143530"/>
-  </svg>
-  <div>
-    <h1>Gestor de Rentas</h1>
-    <div class="sub" id="headerSub">Cargando…</div>
+  <div class="brand-group">
+    <svg class="logo" viewBox="0 0 100 100" width="38" height="38" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs><linearGradient id="logoGradTop" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#173F38"/><stop offset="55%" stop-color="#2F8F73"/><stop offset="100%" stop-color="#3AA0A0"/>
+      </linearGradient></defs>
+      <rect x="2" y="2" width="96" height="96" rx="26" fill="url(#logoGradTop)"/>
+      <path d="M50 18 L82 44 V80 H18 V44 Z" fill="none" stroke="#F4EFE3" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+      <rect x="39" y="50" width="22" height="30" rx="3" fill="#E3A63E"/>
+      <circle cx="50" cy="65" r="3.4" fill="#143530"/>
+    </svg>
+    <div>
+      <h1>Gestor de Rentas</h1>
+      <div class="sub" id="headerSub">Cargando…</div>
+    </div>
   </div>
+  <button class="icon-btn" id="btnOpenSettings" aria-label="Ajustes">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
 </header>
 
 <main>
@@ -255,36 +273,34 @@
   <section class="view active" id="view-resumen">
     <div class="chips" id="chips-resumen"></div>
     <div class="grid-summary">
-      <div class="stat">
-        <div class="stat-icon bg-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
+      <div class="stat tint-green">
+        <div class="stat-icon solid-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
         <div class="label">Renta cobrada (mes)</div><div class="value" id="statRentMonth">$0</div>
       </div>
-      <div class="stat">
-        <div class="stat-icon bg-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8z"/><line x1="8" y1="8" x2="14" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/></svg></div>
+      <div class="stat tint-rose">
+        <div class="stat-icon solid-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8z"/><line x1="8" y1="8" x2="14" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/></svg></div>
         <div class="label">Gastos (mes)</div><div class="value neg" id="statExpMonth">$0</div>
       </div>
-      <div class="stat">
-        <div class="stat-icon bg-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
+      <div class="stat tint-teal">
+        <div class="stat-icon solid-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
         <div class="label">Ganancia neta (mes)</div><div class="value" id="statNet">$0</div>
       </div>
-      <div class="stat">
-        <div class="stat-icon bg-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+      <div class="stat tint-purple">
+        <div class="stat-icon solid-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
         <div class="label">Inquilinos activos</div><div class="value" id="statTenants">0</div>
       </div>
-      <div class="stat">
-        <div class="stat-icon bg-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 4 0M5 17a2 2 0 1 1 4 0m6 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0M3 17V9l2-5h14l2 5v8"/></svg></div>
+      <div class="stat tint-indigo">
+        <div class="stat-icon solid-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 4 0M5 17a2 2 0 1 1 4 0m6 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0M3 17V9l2-5h14l2 5v8"/></svg></div>
         <div class="label">Millas (mes)</div><div class="value" id="statMiles">0</div>
       </div>
-      <div class="stat">
-        <div class="stat-icon bg-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+      <div class="stat tint-amber">
+        <div class="stat-icon solid-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
         <div class="label">Horas (mes)</div><div class="value" id="statHours">0</div>
       </div>
     </div>
     <button class="btn primary block" id="btnReport">Generar reporte para tu contador</button>
     <button class="btn ghost block" id="btnShareApp">Compartir solicitud de arrendamiento</button>
     <button class="btn ghost block" id="btnShareReport">Compartir enlace de reportes con inquilinos</button>
-    <button class="btn ghost block" id="btnEnableBio">Activar huella / Face ID para entrar</button>
-    <button class="btn ghost block" id="btnLogout" style="color:var(--ink-soft);">Cerrar sesión</button>
     <div class="section-title c-amber">Cobros próximos</div>
     <div id="upcomingList"></div>
     <div class="section-title c-rose">Rentas pendientes</div>
@@ -335,6 +351,43 @@
     <div class="section-title c-amber">Horas del negocio</div>
     <div id="hoursList"></div>
   </section>
+
+  <!-- AJUSTES -->
+  <section class="view" id="view-ajustes">
+    <div class="section-title">Ajustes</div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;">Cuenta</div>
+      <div class="item-meta" style="margin-bottom:14px;">Usuario actual: <strong id="ajustesCurrentUser">—</strong></div>
+      <div class="field"><label>Nuevo usuario</label><input id="set_newUser" type="text"></div>
+      <div class="field"><label>Contraseña actual</label><input id="set_currentPass" type="password"></div>
+      <div class="field"><label>Nueva contraseña</label><input id="set_newPass" type="password" placeholder="Déjalo vacío para no cambiarla"></div>
+      <div class="field"><label>Confirmar nueva contraseña</label><input id="set_newPass2" type="password"></div>
+      <div id="credsMsg" class="balance-note" style="display:none; margin-bottom:8px;"></div>
+      <button class="btn primary block" id="btnSaveCreds" style="width:100%;">Guardar cambios</button>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;">Seguridad</div>
+      <div class="item-meta" style="margin-bottom:14px;">Desbloquea la app con tu huella o Face ID en vez de escribir tu contraseña.</div>
+      <button class="btn ghost block" id="btnEnableBio" style="width:100%;">Activar huella / Face ID para entrar</button>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;">Notificaciones</div>
+      <div class="item-meta" style="margin-bottom:14px;">Te avisamos de cobros próximos y rentas pendientes cada vez que abras la app.</div>
+      <button class="btn ghost block" id="btnEnableNotif" style="width:100%;">Activar notificaciones</button>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;">Ícono y accesos del celular</div>
+      <div class="item-meta">El ícono en tu pantalla de inicio y los permisos del navegador (Chrome) se controlan desde tu celular, no desde aquí. Para gestionarlos: mantén presionado el ícono de la app → "Información de la app", o desde Chrome → Configuración → Configuración de sitios.</div>
+    </div>
+
+    <button class="btn ghost block" id="btnLogout" style="color:var(--ink-soft);">Cerrar sesión</button>
+
+    <div class="hint" style="text-align:center; margin-top:18px;">Gestor de Rentas · tus datos se guardan solo en este dispositivo</div>
+  </section>
 </main>
 
 <button class="fab" id="fabAdd">+</button>
@@ -347,6 +400,7 @@
   <button data-view="gastos"><span class="dot"></span>Gastos</button>
   <button data-view="millas"><span class="dot"></span>Millas</button>
   <button data-view="horas"><span class="dot"></span>Horas</button>
+  <button data-view="ajustes"><span class="dot"></span>Ajustes</button>
 </nav>
 
 <div class="overlay" id="overlay">
@@ -568,8 +622,16 @@ function switchView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   $('#view-'+v).classList.add('active');
   document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.getElementById('fabAdd').style.display = (v==='ajustes') ? 'none' : 'flex';
+  if(v==='ajustes') renderAjustes();
 }
 document.querySelectorAll('nav.bottom button').forEach(b=>b.addEventListener('click', ()=>switchView(b.dataset.view)));
+document.getElementById('btnOpenSettings')?.addEventListener('click', ()=>switchView('ajustes'));
+
+function renderAjustes(){
+  const auth = getAuth();
+  document.getElementById('ajustesCurrentUser').textContent = auth ? auth.user : '—';
+}
 
 function renderAll(){
   renderChipsAll();
@@ -1370,6 +1432,61 @@ async function loginWithBiometric(){
 }
 document.getElementById('btnEnableBio')?.addEventListener('click', registerBiometric);
 
+/* ---------- Cambiar usuario / contraseña desde Ajustes ---------- */
+document.getElementById('btnSaveCreds')?.addEventListener('click', async ()=>{
+  const msg = document.getElementById('credsMsg');
+  msg.style.display = 'none';
+  const auth = getAuth();
+  const currentPass = document.getElementById('set_currentPass').value;
+  const newUser = document.getElementById('set_newUser').value.trim();
+  const newPass = document.getElementById('set_newPass').value;
+  const newPass2 = document.getElementById('set_newPass2').value;
+
+  if(!currentPass){ msg.textContent = 'Escribe tu contraseña actual para confirmar los cambios.'; msg.style.display='block'; return; }
+  const currentHash = await sha256(currentPass);
+  if(!auth || currentHash !== auth.passHash){ msg.textContent = 'Tu contraseña actual no es correcta.'; msg.style.display='block'; return; }
+  if(newPass && newPass !== newPass2){ msg.textContent = 'Las contraseñas nuevas no coinciden.'; msg.style.display='block'; return; }
+
+  const updated = {
+    user: newUser || auth.user,
+    passHash: newPass ? await sha256(newPass) : auth.passHash
+  };
+  localStorage.setItem('gestorRentas_auth', JSON.stringify(updated));
+  document.getElementById('set_newUser').value = '';
+  document.getElementById('set_currentPass').value = '';
+  document.getElementById('set_newPass').value = '';
+  document.getElementById('set_newPass2').value = '';
+  renderAjustes();
+  msg.style.color = 'var(--green-soft)';
+  msg.textContent = 'Listo, tus datos de acceso se actualizaron.';
+  msg.style.display = 'block';
+});
+
+/* ---------- Notificaciones locales (al abrir la app) ---------- */
+document.getElementById('btnEnableNotif')?.addEventListener('click', async ()=>{
+  if(!('Notification' in window)){ alert('Tu navegador no soporta notificaciones.'); return; }
+  const perm = await Notification.requestPermission();
+  if(perm === 'granted'){
+    localStorage.setItem('gestorRentas_notifPref', '1');
+    document.getElementById('btnEnableNotif').textContent = 'Notificaciones activadas ✓';
+    checkAndNotify();
+  }else{
+    alert('No se activaron las notificaciones. Puedes permitirlas desde la configuración del sitio en Chrome.');
+  }
+});
+function checkAndNotify(){
+  if(localStorage.getItem('gestorRentas_notifPref') !== '1') return;
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  const pendCount = DB.rents.filter(r=>Number(r.amountDue||0)-Number(r.amountPaid||0) > 0.001).length;
+  const upcomingCount = DB.tenants.filter(t=>{ const info = daysUntilPayDay(t.payDay); return info && info.diff<=2; }).length;
+  if(pendCount || upcomingCount){
+    const parts = [];
+    if(upcomingCount) parts.push(upcomingCount + ' cobro' + (upcomingCount===1?'':'s') + ' próximo' + (upcomingCount===1?'':'s'));
+    if(pendCount) parts.push(pendCount + ' renta' + (pendCount===1?'':'s') + ' pendiente' + (pendCount===1?'':'s'));
+    new Notification('Gestor de Rentas', { body: parts.join(' · '), icon:'icon-192.png' });
+  }
+}
+
 /* ---------- Acceso con usuario y contraseña (candado local del dispositivo) ---------- */
 async function sha256(text){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -1382,6 +1499,10 @@ function showApp(){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
   loadAll();
+  setTimeout(checkAndNotify, 800);
+  if(localStorage.getItem('gestorRentas_notifPref')==='1' && document.getElementById('btnEnableNotif')){
+    document.getElementById('btnEnableNotif').textContent = 'Notificaciones activadas ✓';
+  }
 }
 function initLogin(){
   const auth = getAuth();
