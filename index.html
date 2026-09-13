@@ -171,6 +171,7 @@
   nav.bottom button[data-view="millas"].active .dot{background:var(--indigo);}
   nav.bottom button[data-view="horas"].active .dot{background:var(--amber);}
   nav.bottom button[data-view="ajustes"].active .dot{background:var(--ink-soft);}
+  nav.bottom button[data-view="herramientas"].active .dot{background:var(--blue);}
 
   /* Floating add button */
   .fab{
@@ -263,9 +264,12 @@
       <div class="sub" id="headerSub">Cargando…</div>
     </div>
   </div>
-  <button class="icon-btn" id="btnOpenSettings" aria-label="Ajustes">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-  </button>
+  <div style="display:flex; align-items:center; gap:8px;">
+    <button class="icon-btn" id="btnHeaderLang" aria-label="Idioma / Language" style="width:auto; padding:0 12px; border-radius:18px; font-size:12px; font-weight:700;">ES</button>
+    <button class="icon-btn" id="btnOpenSettings" aria-label="Ajustes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+  </div>
 </header>
 
 <main>
@@ -275,48 +279,49 @@
     <div class="grid-summary">
       <div class="stat tint-green">
         <div class="stat-icon solid-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>
-        <div class="label">Renta cobrada (mes)</div><div class="value" id="statRentMonth">$0</div>
+        <div class="label" data-i18n-app="stat_rent">Renta cobrada (mes)</div><div class="value" id="statRentMonth">$0</div>
       </div>
       <div class="stat tint-rose">
         <div class="stat-icon solid-rose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8z"/><line x1="8" y1="8" x2="14" y2="8"/><line x1="8" y1="12" x2="14" y2="12"/></svg></div>
-        <div class="label">Gastos (mes)</div><div class="value neg" id="statExpMonth">$0</div>
+        <div class="label" data-i18n-app="stat_exp">Gastos (mes)</div><div class="value neg" id="statExpMonth">$0</div>
       </div>
       <div class="stat tint-teal">
         <div class="stat-icon solid-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div>
-        <div class="label">Ganancia neta (mes)</div><div class="value" id="statNet">$0</div>
+        <div class="label" data-i18n-app="stat_net">Ganancia neta (mes)</div><div class="value" id="statNet">$0</div>
       </div>
       <div class="stat tint-purple">
         <div class="stat-icon solid-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <div class="label">Inquilinos activos</div><div class="value" id="statTenants">0</div>
+        <div class="label" data-i18n-app="stat_tenants">Inquilinos activos</div><div class="value" id="statTenants">0</div>
       </div>
       <div class="stat tint-indigo">
         <div class="stat-icon solid-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17h14M5 17a2 2 0 1 0 4 0M5 17a2 2 0 1 1 4 0m6 0a2 2 0 1 0 4 0m-4 0a2 2 0 1 1 4 0M3 17V9l2-5h14l2 5v8"/></svg></div>
-        <div class="label">Millas (mes)</div><div class="value" id="statMiles">0</div>
+        <div class="label" data-i18n-app="stat_miles">Millas (mes)</div><div class="value" id="statMiles">0</div>
       </div>
       <div class="stat tint-amber">
         <div class="stat-icon solid-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
-        <div class="label">Horas (mes)</div><div class="value" id="statHours">0</div>
+        <div class="label" data-i18n-app="stat_hours">Horas (mes)</div><div class="value" id="statHours">0</div>
       </div>
     </div>
-    <button class="btn primary block" id="btnReport">Generar reporte para tu contador</button>
-    <button class="btn ghost block" id="btnShareApp">Compartir solicitud de arrendamiento</button>
-    <button class="btn ghost block" id="btnShareReport">Compartir enlace de reportes con inquilinos</button>
-    <div class="section-title c-amber">Cobros próximos</div>
+    <button class="btn primary block" id="btnReport" data-i18n-app="btn_report">Generar reporte para tu contador</button>
+    <button class="btn ghost block" id="btnShareApp" data-i18n-app="btn_shareApp">Compartir solicitud de arrendamiento</button>
+    <button class="btn ghost block" id="btnShareReport" data-i18n-app="btn_shareReport">Compartir enlace de reportes con inquilinos</button>
+    <button class="btn ghost block" id="btnSharePayment" style="display:none;" data-i18n-app="btn_sharePayment">Compartir link de pago</button>
+    <div class="section-title c-amber" data-i18n-app="sec_upcoming">Cobros próximos</div>
     <div id="upcomingList"></div>
-    <div class="section-title c-rose">Rentas pendientes</div>
+    <div class="section-title c-rose" data-i18n-app="sec_pending">Rentas pendientes</div>
     <div id="pendingList"></div>
   </section>
 
   <!-- PROPIEDADES -->
   <section class="view" id="view-propiedades">
-    <div class="section-title c-blue">Propiedades</div>
+    <div class="section-title c-blue" data-i18n-app="sec_properties">Propiedades</div>
     <div id="propertiesList"></div>
   </section>
 
   <!-- INQUILINOS -->
   <section class="view" id="view-inquilinos">
     <div class="chips" id="chips-inquilinos"></div>
-    <div class="section-title c-purple">Inquilinos</div>
+    <div class="section-title c-purple" data-i18n-app="sec_tenants">Inquilinos</div>
     <div id="tenantsList"></div>
   </section>
 
@@ -336,10 +341,10 @@
 
   <!-- MILLAS -->
   <section class="view" id="view-millas">
-    <div class="section-title c-indigo">Millas del negocio</div>
+    <div class="section-title c-indigo" data-i18n-app="sec_mileage">Millas del negocio</div>
     <div class="card card-indigo" style="margin-bottom:14px;">
       <div class="row-item">
-        <div class="main"><div class="item-name">Total registrado</div><div class="item-meta">Deducción estimada · referencia $0.70/milla</div></div>
+        <div class="main"><div class="item-name" data-i18n-app="total_registrado">Total registrado</div><div class="item-meta" data-i18n-app="deduccion_ref">Deducción estimada · referencia $0.70/milla</div></div>
         <div class="item-amount pos" id="milesTotal">0 mi</div>
       </div>
     </div>
@@ -348,59 +353,106 @@
 
   <!-- HORAS -->
   <section class="view" id="view-horas">
-    <div class="section-title c-amber">Horas del negocio</div>
+    <div class="section-title c-amber" data-i18n-app="sec_hours">Horas del negocio</div>
     <div id="hoursList"></div>
   </section>
 
   <!-- AJUSTES -->
   <section class="view" id="view-ajustes">
-    <div class="section-title">Ajustes</div>
+    <div class="section-title" data-i18n-app="ajustes_title">Ajustes</div>
 
     <div class="card" style="margin-bottom:16px;">
-      <div class="item-name" style="margin-bottom:2px;">Cuenta</div>
-      <div class="item-meta" style="margin-bottom:14px;">Usuario actual: <strong id="ajustesCurrentUser">—</strong></div>
-      <div class="field"><label>Nuevo usuario</label><input id="set_newUser" type="text"></div>
-      <div class="field"><label>Contraseña actual</label><input id="set_currentPass" type="password"></div>
-      <div class="field"><label>Nueva contraseña</label><input id="set_newPass" type="password" placeholder="Déjalo vacío para no cambiarla"></div>
-      <div class="field"><label>Confirmar nueva contraseña</label><input id="set_newPass2" type="password"></div>
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_cuenta">Cuenta</div>
+      <div class="item-meta" style="margin-bottom:14px;"><span data-i18n-app="ajustes_usuarioActual">Usuario actual:</span> <strong id="ajustesCurrentUser">—</strong></div>
+      <div class="field"><label data-i18n-app="ajustes_nuevoUsuario">Nuevo usuario</label><input id="set_newUser" type="text"></div>
+      <div class="field"><label data-i18n-app="ajustes_contrasenaActual">Contraseña actual</label><input id="set_currentPass" type="password"></div>
+      <div class="field"><label data-i18n-app="ajustes_nuevaContrasena">Nueva contraseña</label><input id="set_newPass" type="password" placeholder="Déjalo vacío para no cambiarla"></div>
+      <div class="field"><label data-i18n-app="ajustes_confirmarContrasena">Confirmar nueva contraseña</label><input id="set_newPass2" type="password"></div>
       <div id="credsMsg" class="balance-note" style="display:none; margin-bottom:8px;"></div>
-      <button class="btn primary block" id="btnSaveCreds" style="width:100%;">Guardar cambios</button>
+      <button class="btn primary block" id="btnSaveCreds" style="width:100%;" data-i18n-app="ajustes_guardarCambios">Guardar cambios</button>
     </div>
 
     <div class="card" style="margin-bottom:16px;">
-      <div class="item-name" style="margin-bottom:2px;">Seguridad</div>
-      <div class="item-meta" style="margin-bottom:14px;">Desbloquea la app con tu huella o Face ID en vez de escribir tu contraseña.</div>
-      <button class="btn ghost block" id="btnEnableBio" style="width:100%;">Activar huella / Face ID para entrar</button>
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_seguridad">Seguridad</div>
+      <div class="item-meta" style="margin-bottom:14px;" data-i18n-app="ajustes_seguridadDesc">Desbloquea la app con tu huella o Face ID en vez de escribir tu contraseña.</div>
+      <button class="btn ghost block" id="btnEnableBio" style="width:100%;" data-i18n-app="ajustes_activarHuella">Activar huella / Face ID para entrar</button>
     </div>
 
     <div class="card" style="margin-bottom:16px;">
-      <div class="item-name" style="margin-bottom:2px;">Notificaciones</div>
-      <div class="item-meta" style="margin-bottom:14px;">Te avisamos de cobros próximos y rentas pendientes cada vez que abras la app.</div>
-      <button class="btn ghost block" id="btnEnableNotif" style="width:100%;">Activar notificaciones</button>
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_notificaciones">Notificaciones</div>
+      <div class="item-meta" style="margin-bottom:14px;" data-i18n-app="ajustes_notifDesc">Te avisamos de cobros próximos y rentas pendientes cada vez que abras la app.</div>
+      <button class="btn ghost block" id="btnEnableNotif" style="width:100%;" data-i18n-app="ajustes_activarNotif">Activar notificaciones</button>
     </div>
 
     <div class="card" style="margin-bottom:16px;">
-      <div class="item-name" style="margin-bottom:2px;">Ícono y accesos del celular</div>
-      <div class="item-meta">El ícono en tu pantalla de inicio y los permisos del navegador (Chrome) se controlan desde tu celular, no desde aquí. Para gestionarlos: mantén presionado el ícono de la app → "Información de la app", o desde Chrome → Configuración → Configuración de sitios.</div>
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_icono">Ícono y accesos del celular</div>
+      <div class="item-meta" data-i18n-app="ajustes_iconoDesc">El ícono en tu pantalla de inicio y los permisos del navegador (Chrome) se controlan desde tu celular, no desde aquí.</div>
     </div>
 
-    <button class="btn ghost block" id="btnLogout" style="color:var(--ink-soft);">Cerrar sesión</button>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_idiomaTitle">Idioma / Language</div>
+      <div class="item-meta" style="margin-bottom:14px;" data-i18n-app="ajustes_idiomaDesc">Cambia el idioma de toda la app.</div>
+      <button class="btn ghost block" id="btnToggleLang" style="width:100%;">English</button>
+    </div>
 
-    <div class="hint" style="text-align:center; margin-top:18px;">Gestor de Rentas · tus datos se guardan solo en este dispositivo</div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_pagosTitle">Pagos externos</div>
+      <div class="item-meta" style="margin-bottom:14px;" data-i18n-app="ajustes_pagosDesc">Guarda tu link de Zelle, PayPal o Venmo para compartirlo rápido con tus inquilinos.</div>
+      <div class="field"><label data-i18n-app="ajustes_linkPago">Link de pago</label><input id="set_paymentLink" type="url" placeholder="https://paypal.me/tu-usuario"></div>
+      <button class="btn ghost block" id="btnSavePaymentLink" style="width:100%;" data-i18n-app="ajustes_guardarLink">Guardar link</button>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_respaldoTitle">Copias de seguridad</div>
+      <div class="item-meta" style="margin-bottom:14px;" data-i18n-app="ajustes_respaldoDesc">Descarga todos tus datos como respaldo, o restaura desde un respaldo anterior.</div>
+      <button class="btn ghost block" id="btnExportBackup" style="width:100%; margin-bottom:10px;" data-i18n-app="ajustes_exportar">Exportar todos mis datos</button>
+      <div class="photo-upload">
+        <input type="file" accept="application/json" id="importBackupFile">
+        <div class="hint" data-i18n-app="ajustes_importarHint">Selecciona un archivo de respaldo (.json) para restaurarlo. Esto reemplaza los datos actuales.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_actividad">Actividad reciente</div>
+      <div id="activityLog" class="item-meta"></div>
+    </div>
+
+    <button class="btn ghost block" id="btnLogout" style="color:var(--ink-soft);" data-i18n-app="ajustes_cerrarSesion">Cerrar sesión</button>
+
+    <div class="hint" style="text-align:center; margin-top:18px;" data-i18n-app="ajustes_footer">Gestor de Rentas · tus datos se guardan solo en este dispositivo</div>
+  </section>
+
+  <!-- HERRAMIENTAS -->
+  <section class="view" id="view-herramientas">
+    <div class="section-title c-blue" data-i18n-app="sec_leaseEnding">Contratos por vencer</div>
+    <div id="leaseEndingList"></div>
+
+    <div class="section-title c-indigo" style="display:flex; align-items:center; justify-content:space-between;">
+      <span data-i18n-app="sec_providers">Proveedores</span>
+      <button id="btnAddProvider" style="background:none; border:none; color:var(--indigo); font-weight:700; font-size:20px; cursor:pointer;">+</button>
+    </div>
+    <div id="providersList"></div>
+
+    <div class="section-title c-amber" style="display:flex; align-items:center; justify-content:space-between;">
+      <span data-i18n-app="sec_tasks">Lista de arreglos</span>
+      <button id="btnAddTask" style="background:none; border:none; color:var(--amber); font-weight:700; font-size:20px; cursor:pointer;">+</button>
+    </div>
+    <div id="tasksList"></div>
   </section>
 </main>
 
 <button class="fab" id="fabAdd">+</button>
 
 <nav class="bottom">
-  <button data-view="resumen" class="active"><span class="dot"></span>Resumen</button>
-  <button data-view="propiedades"><span class="dot"></span>Propiedades</button>
-  <button data-view="inquilinos"><span class="dot"></span>Inquilinos</button>
-  <button data-view="rentas"><span class="dot"></span>Rentas</button>
-  <button data-view="gastos"><span class="dot"></span>Gastos</button>
-  <button data-view="millas"><span class="dot"></span>Millas</button>
-  <button data-view="horas"><span class="dot"></span>Horas</button>
-  <button data-view="ajustes"><span class="dot"></span>Ajustes</button>
+  <button data-view="resumen" class="active"><span class="dot"></span><span data-i18n-app="nav_resumen">Resumen</span></button>
+  <button data-view="propiedades"><span class="dot"></span><span data-i18n-app="nav_propiedades">Propiedades</span></button>
+  <button data-view="inquilinos"><span class="dot"></span><span data-i18n-app="nav_inquilinos">Inquilinos</span></button>
+  <button data-view="rentas"><span class="dot"></span><span data-i18n-app="nav_rentas">Rentas</span></button>
+  <button data-view="gastos"><span class="dot"></span><span data-i18n-app="nav_gastos">Gastos</span></button>
+  <button data-view="millas"><span class="dot"></span><span data-i18n-app="nav_millas">Millas</span></button>
+  <button data-view="horas"><span class="dot"></span><span data-i18n-app="nav_horas">Horas</span></button>
+  <button data-view="ajustes"><span class="dot"></span><span data-i18n-app="nav_ajustes">Ajustes</span></button>
+  <button data-view="herramientas"><span class="dot"></span><span data-i18n-app="nav_mas">Más</span></button>
 </nav>
 
 <div class="overlay" id="overlay">
@@ -550,13 +602,115 @@
 
 <script>
 const STORAGE_PREFIX = 'gestorRentas_';
-const KEYS = ['properties','tenants','rents','expenses','mileage','hours'];
-let DB = { properties:[], tenants:[], rents:[], expenses:[], mileage:[], hours:[] };
+const KEYS = ['properties','tenants','rents','expenses','mileage','hours','providers','tasks'];
+let DB = { properties:[], tenants:[], rents:[], expenses:[], mileage:[], hours:[], providers:[], tasks:[] };
 let currentView = 'resumen';
 let editing = null;
 let filterProp = 'all';
 let tempPhotos = [];
 let tempRoomPhotos = [];
+let tempReceipts = [];
+
+/* ---------- Motor de traducción de la app principal (ES/EN) ---------- */
+let appLang = localStorage.getItem('gestorRentas_appLang') || 'es';
+const APP_I18N = {
+  es: {
+    nav_resumen:'Resumen', nav_propiedades:'Propiedades', nav_inquilinos:'Inquilinos', nav_rentas:'Rentas',
+    nav_gastos:'Gastos', nav_millas:'Millas', nav_horas:'Horas', nav_ajustes:'Ajustes', nav_mas:'Más',
+    header_subtitle:'Tus propiedades, un solo lugar', header_loading:'Cargando…',
+    stat_rent:'Renta cobrada (mes)', stat_exp:'Gastos (mes)', stat_net:'Ganancia neta (mes)',
+    stat_tenants:'Inquilinos activos', stat_miles:'Millas (mes)', stat_hours:'Horas (mes)',
+    btn_report:'Generar reporte para tu contador', btn_shareApp:'Compartir solicitud de arrendamiento',
+    btn_shareReport:'Compartir enlace de reportes con inquilinos', btn_sharePayment:'Compartir link de pago',
+    sec_upcoming:'Cobros próximos', sec_pending:'Rentas pendientes',
+    empty_upcoming:'No hay cobros programados en los próximos 7 días.', empty_pending:'No hay rentas pendientes.',
+    debe:'Debe', abono:'abonó',
+    sec_properties:'Propiedades', empty_properties:'Aún no tienes propiedades. Toca + para agregar la primera.', ver_video:'Ver video', fotos:'fotos',
+    sec_tenants:'Inquilinos', empty_tenants:'Aún no tienes inquilinos aquí. Toca + para agregar uno.', sin_habitacion:'Sin habitación/unidad',
+    deposito:'Depósito', dep_pendiente:'Pendiente', dep_devuelto:'Devuelto',
+    sec_rents:'Pagos de renta', empty_rents:'Aún no has registrado pagos de renta.', debia:'debía',
+    tag_pagado:'Pagado', tag_parcial:'Parcial', tag_pendiente:'Pendiente',
+    sec_expenses:'Gastos y biles', empty_expenses:'Aún no has registrado gastos aquí.', general:'General',
+    sec_mileage:'Millas del negocio', total_registrado:'Total registrado', deduccion_ref:'Deducción estimada · referencia $0.70/milla', empty_mileage:'Aún no has registrado millas.',
+    sec_hours:'Horas del negocio', empty_hours:'Aún no has registrado horas.', trabajo_negocio:'Trabajo del negocio',
+    sec_leaseEnding:'Contratos por vencer', empty_leaseEnding:'No hay contratos por vencer en los próximos 30 días.', vencido:'Vencido', en_dias:'En {n} días',
+    sec_providers:'Proveedores', empty_providers:'Aún no tienes proveedores.',
+    sec_tasks:'Lista de arreglos', empty_tasks:'No tienes arreglos pendientes.', resuelto:'Resuelto', sin_propiedad:'Sin propiedad',
+    ajustes_title:'Ajustes', ajustes_cuenta:'Cuenta', ajustes_usuarioActual:'Usuario actual:',
+    ajustes_nuevoUsuario:'Nuevo usuario', ajustes_contrasenaActual:'Contraseña actual', ajustes_nuevaContrasena:'Nueva contraseña',
+    ajustes_confirmarContrasena:'Confirmar nueva contraseña', ajustes_guardarCambios:'Guardar cambios',
+    ajustes_seguridad:'Seguridad', ajustes_seguridadDesc:'Desbloquea la app con tu huella o Face ID en vez de escribir tu contraseña.',
+    ajustes_activarHuella:'Activar huella / Face ID para entrar',
+    ajustes_notificaciones:'Notificaciones', ajustes_notifDesc:'Te avisamos de cobros próximos y rentas pendientes cada vez que abras la app.',
+    ajustes_activarNotif:'Activar notificaciones',
+    ajustes_icono:'Ícono y accesos del celular',
+    ajustes_iconoDesc:'El ícono en tu pantalla de inicio y los permisos del navegador (Chrome) se controlan desde tu celular, no desde aquí.',
+    ajustes_cerrarSesion:'Cerrar sesión', ajustes_footer:'Gestor de Rentas · tus datos se guardan solo en este dispositivo',
+    ajustes_idiomaTitle:'Idioma / Language', ajustes_idiomaDesc:'Cambia el idioma de toda la app.',
+    ajustes_pagosTitle:'Pagos externos', ajustes_pagosDesc:'Guarda tu link de Zelle, PayPal o Venmo para compartirlo rápido con tus inquilinos.',
+    ajustes_linkPago:'Link de pago', ajustes_guardarLink:'Guardar link',
+    ajustes_respaldoTitle:'Copias de seguridad', ajustes_respaldoDesc:'Descarga todos tus datos como respaldo, o restaura desde un respaldo anterior.',
+    ajustes_exportar:'Exportar todos mis datos', ajustes_importarHint:'Selecciona un archivo de respaldo (.json) para restaurarlo. Esto reemplaza los datos actuales.',
+    ajustes_actividad:'Actividad reciente', ajustes_sinActividad:'Sin actividad reciente.'
+  },
+  en: {
+    nav_resumen:'Summary', nav_propiedades:'Properties', nav_inquilinos:'Tenants', nav_rentas:'Rent',
+    nav_gastos:'Expenses', nav_millas:'Mileage', nav_horas:'Hours', nav_ajustes:'Settings', nav_mas:'More',
+    header_subtitle:'Your properties, one place', header_loading:'Loading…',
+    stat_rent:'Rent collected (month)', stat_exp:'Expenses (month)', stat_net:'Net profit (month)',
+    stat_tenants:'Active tenants', stat_miles:'Mileage (month)', stat_hours:'Hours (month)',
+    btn_report:'Generate report for your accountant', btn_shareApp:'Share rental application',
+    btn_shareReport:'Share maintenance report link with tenants', btn_sharePayment:'Share payment link',
+    sec_upcoming:'Upcoming payments', sec_pending:'Pending rent',
+    empty_upcoming:'No payments scheduled in the next 7 days.', empty_pending:'No pending rent.',
+    debe:'Owes', abono:'paid',
+    sec_properties:'Properties', empty_properties:'No properties yet. Tap + to add the first one.', ver_video:'Watch video', fotos:'photos',
+    sec_tenants:'Tenants', empty_tenants:'No tenants here yet. Tap + to add one.', sin_habitacion:'No unit/room',
+    deposito:'Deposit', dep_pendiente:'Pending', dep_devuelto:'Returned',
+    sec_rents:'Rent payments', empty_rents:'No rent payments recorded yet.', debia:'owed',
+    tag_pagado:'Paid', tag_parcial:'Partial', tag_pendiente:'Pending',
+    sec_expenses:'Expenses & bills', empty_expenses:'No expenses recorded here yet.', general:'General',
+    sec_mileage:'Business mileage', total_registrado:'Total recorded', deduccion_ref:'Estimated deduction · reference $0.70/mile', empty_mileage:'No mileage recorded yet.',
+    sec_hours:'Business hours', empty_hours:'No hours recorded yet.', trabajo_negocio:'Business work',
+    sec_leaseEnding:'Leases ending soon', empty_leaseEnding:'No leases ending in the next 30 days.', vencido:'Expired', en_dias:'In {n} days',
+    sec_providers:'Vendors', empty_providers:'No vendors yet.',
+    sec_tasks:'Repair list', empty_tasks:'No pending repairs.', resuelto:'Done', sin_propiedad:'No property',
+    ajustes_title:'Settings', ajustes_cuenta:'Account', ajustes_usuarioActual:'Current user:',
+    ajustes_nuevoUsuario:'New username', ajustes_contrasenaActual:'Current password', ajustes_nuevaContrasena:'New password',
+    ajustes_confirmarContrasena:'Confirm new password', ajustes_guardarCambios:'Save changes',
+    ajustes_seguridad:'Security', ajustes_seguridadDesc:'Unlock the app with your fingerprint or Face ID instead of typing your password.',
+    ajustes_activarHuella:'Enable fingerprint / Face ID login',
+    ajustes_notificaciones:'Notifications', ajustes_notifDesc:'We\'ll notify you of upcoming and pending rent every time you open the app.',
+    ajustes_activarNotif:'Enable notifications',
+    ajustes_icono:'Icon & phone access',
+    ajustes_iconoDesc:'Your home screen icon and browser (Chrome) permissions are controlled from your phone, not from here.',
+    ajustes_cerrarSesion:'Log out', ajustes_footer:'Gestor de Rentas · your data is saved only on this device',
+    ajustes_idiomaTitle:'Language / Idioma', ajustes_idiomaDesc:'Change the language of the whole app.',
+    ajustes_pagosTitle:'External payments', ajustes_pagosDesc:'Save your Zelle, PayPal, or Venmo link to quickly share it with your tenants.',
+    ajustes_linkPago:'Payment link', ajustes_guardarLink:'Save link',
+    ajustes_respaldoTitle:'Backups', ajustes_respaldoDesc:'Download all your data as a backup, or restore from a previous backup.',
+    ajustes_exportar:'Export all my data', ajustes_importarHint:'Select a backup file (.json) to restore it. This replaces the current data.',
+    ajustes_actividad:'Recent activity', ajustes_sinActividad:'No recent activity.'
+  }
+};
+function tr(key){ return (APP_I18N[appLang] && APP_I18N[appLang][key]) || APP_I18N.es[key] || key; }
+function applyStaticI18n(){
+  document.querySelectorAll('[data-i18n-app]').forEach(el=>{ el.textContent = tr(el.dataset.i18nApp); });
+}
+function setAppLang(lang){
+  appLang = lang;
+  localStorage.setItem('gestorRentas_appLang', lang);
+  applyStaticI18n();
+  document.getElementById('headerSub').textContent = tr('header_subtitle');
+  renderAll();
+  renderAjustes();
+  const headerBtn = document.getElementById('btnHeaderLang');
+  if(headerBtn) headerBtn.textContent = appLang==='es' ? 'EN' : 'ES';
+}
+document.getElementById('btnHeaderLang')?.addEventListener('click', ()=>{
+  setAppLang(appLang==='es' ? 'en' : 'es');
+});
+if(document.getElementById('btnHeaderLang')) document.getElementById('btnHeaderLang').textContent = appLang==='es' ? 'EN' : 'ES';
 
 const $ = s => document.querySelector(s);
 const fmt$ = n => '$' + (Math.round((n||0)*100)/100).toLocaleString('es-ES',{minimumFractionDigits:2, maximumFractionDigits:2});
@@ -598,14 +752,15 @@ function readAndCompressImage(file, maxDim, quality){
 
 /* ---------- Storage (localStorage: works standalone, installed on phone) ---------- */
 async function loadAll(){
-  $('#headerSub').textContent = 'Cargando datos…';
+  applyStaticI18n();
+  $('#headerSub').textContent = tr('header_loading');
   for(const k of KEYS){
     try{
       const raw = localStorage.getItem(STORAGE_PREFIX+k);
       DB[k] = raw ? JSON.parse(raw) : [];
     }catch(e){ DB[k] = []; }
   }
-  $('#headerSub').textContent = 'Tus propiedades, un solo lugar';
+  $('#headerSub').textContent = tr('header_subtitle');
   renderAll();
 }
 async function save(key){
@@ -622,15 +777,20 @@ function switchView(v){
   document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
   $('#view-'+v).classList.add('active');
   document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
-  document.getElementById('fabAdd').style.display = (v==='ajustes') ? 'none' : 'flex';
+  document.getElementById('fabAdd').style.display = (v==='ajustes'||v==='herramientas') ? 'none' : 'flex';
   if(v==='ajustes') renderAjustes();
 }
 document.querySelectorAll('nav.bottom button').forEach(b=>b.addEventListener('click', ()=>switchView(b.dataset.view)));
 document.getElementById('btnOpenSettings')?.addEventListener('click', ()=>switchView('ajustes'));
+document.getElementById('btnAddProvider')?.addEventListener('click', ()=>openForm('proveedores', null));
+document.getElementById('btnAddTask')?.addEventListener('click', ()=>openForm('tareas', null));
 
 function renderAjustes(){
   const auth = getAuth();
   document.getElementById('ajustesCurrentUser').textContent = auth ? auth.user : '—';
+  document.getElementById('set_paymentLink').value = localStorage.getItem('gestorRentas_paymentLink') || '';
+  document.getElementById('btnToggleLang').textContent = appLang==='es' ? 'English' : 'Español';
+  renderActivityLog();
 }
 
 function renderAll(){
@@ -642,6 +802,9 @@ function renderAll(){
   renderExpenses();
   renderMileage();
   renderHours();
+  renderProviders();
+  renderTasks();
+  renderLeaseEnding();
 }
 
 /* ---------- Chips (filtro por propiedad) ---------- */
@@ -685,7 +848,7 @@ function renderResumen(){
 
   const upcoming = filteredTenants.map(t=>({t, info:daysUntilPayDay(t.payDay)})).filter(x=>x.info && x.info.diff<=7).sort((a,b)=>a.info.diff-b.info.diff);
   const upEl = $('#upcomingList');
-  if(!upcoming.length){ upEl.innerHTML = '<div class="empty">No hay cobros programados en los próximos 7 días.</div>'; }
+  if(!upcoming.length){ upEl.innerHTML = '<div class="empty">'+tr('empty_upcoming')+'</div>'; }
   else{
     upEl.innerHTML = upcoming.map(x=>`<div class="card row-item">
       <div class="main"><div class="item-name">${esc(x.t.name)}</div><div class="item-meta">Cobra el día ${x.t.payDay} · ${x.info.diff===0?'hoy':'en '+x.info.diff+' día'+(x.info.diff===1?'':'s')}</div></div>
@@ -695,14 +858,14 @@ function renderResumen(){
 
   const pend = filteredRents.filter(r=>Number(r.amountDue||0)-Number(r.amountPaid||0) > 0.001).sort((a,b)=>a.date<b.date?1:-1);
   const list = $('#pendingList');
-  if(!pend.length){ list.innerHTML = '<div class="empty">No hay rentas pendientes.</div>'; return; }
+  if(!pend.length){ list.innerHTML = '<div class="empty">'+tr('empty_pending')+'</div>'; return; }
   list.innerHTML = pend.map(r=>{
     const t = DB.tenants.find(t=>t.id===r.tenantId);
     const balance = Number(r.amountDue||0)-Number(r.amountPaid||0);
     const partial = Number(r.amountPaid||0) > 0;
     return `<div class="card card-rose row-item" data-open="rentas:${r.id}">
-      <div class="main"><div class="item-name">${t?esc(t.name):'Inquilino eliminado'}</div><div class="item-meta">${r.date||''}${partial?' · abonó '+fmt$(r.amountPaid):''}</div></div>
-      <div class="item-amount neg">Debe ${fmt$(balance)}</div>
+      <div class="main"><div class="item-name">${t?esc(t.name):'Inquilino eliminado'}</div><div class="item-meta">${r.date||''}${partial?' · '+tr('abono')+' '+fmt$(r.amountPaid):''}</div></div>
+      <div class="item-amount neg">${tr('debe')} ${fmt$(balance)}</div>
     </div>`;
   }).join('');
 }
@@ -710,16 +873,16 @@ function renderResumen(){
 /* ---------- PROPIEDADES ---------- */
 function renderProperties(){
   const list = $('#propertiesList');
-  if(!DB.properties.length){ list.innerHTML = '<div class="empty">Aún no tienes propiedades. Toca + para agregar la primera.</div>'; return; }
+  if(!DB.properties.length){ list.innerHTML = '<div class="empty">'+tr('empty_properties')+'</div>'; return; }
   list.innerHTML = DB.properties.map(p=>{
     const tenantCount = DB.tenants.filter(t=>t.propertyId===p.id).length;
     const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : []);
     return `<div class="card card-blue property-card" data-open="propiedades:${p.id}">
-      ${photos.length?`<div style="position:relative;"><img class="photo-card-img" src="${photos[0]}" alt="">${photos.length>1?`<span class="photo-badge">${photos.length} fotos</span>`:''}</div>`:''}
+      ${photos.length?`<div style="position:relative;"><img class="photo-card-img" src="${photos[0]}" alt="">${photos.length>1?`<span class="photo-badge">${photos.length} ${tr('fotos')}</span>`:''}</div>`:''}
       <div class="body">
         <div class="item-name">${esc(p.name)}</div>
-        <div class="item-meta">${esc(p.address||'Sin dirección')} · ${tenantCount} inquilino${tenantCount===1?'':'s'}</div>
-        ${p.videoLink?`<a href="${esc(p.videoLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="tag" style="margin-top:8px; text-decoration:none;">▶ Ver video</a>`:''}
+        <div class="item-meta">${esc(p.address||'—')} · ${tenantCount} ${tr('nav_inquilinos').toLowerCase()}</div>
+        ${p.videoLink?`<a href="${esc(p.videoLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="tag" style="margin-top:8px; text-decoration:none;">▶ ${tr('ver_video')}</a>`:''}
       </div>
     </div>`;
   }).join('');
@@ -729,7 +892,7 @@ function renderProperties(){
 function renderTenants(){
   const list = $('#tenantsList');
   const items = filterProp==='all' ? DB.tenants : DB.tenants.filter(t=>t.propertyId===filterProp);
-  if(!items.length){ list.innerHTML = '<div class="empty">Aún no tienes inquilinos aquí. Toca + para agregar uno.</div>'; return; }
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_tenants')+'</div>'; return; }
   list.innerHTML = items.map(t=>{
     const prop = DB.properties.find(p=>p.id===t.propertyId);
     const roomPhotos = (t.roomPhotos && t.roomPhotos.length) ? t.roomPhotos : (t.roomPhoto ? [t.roomPhoto] : []);
@@ -737,8 +900,8 @@ function renderTenants(){
       ${roomPhotos.length?`<img class="thumb" src="${roomPhotos[0]}" alt="">`:''}
       <div class="main">
         <div class="item-name">${esc(t.name)}</div>
-        <div class="item-meta">${esc(t.room||'Sin habitación/unidad')}${prop?' · '+esc(prop.name):''}${t.phone?' · '+esc(t.phone):''}</div>
-        ${t.depositAmount?`<span class="tag ${t.depositReturned?'paid':'pending'}">Depósito ${fmt$(t.depositAmount)} · ${t.depositReturned?'Devuelto':'Pendiente'}</span>`:''}
+        <div class="item-meta">${esc(t.room||tr('sin_habitacion'))}${prop?' · '+esc(prop.name):''}${t.phone?' · '+esc(t.phone):''}</div>
+        ${t.depositAmount?`<span class="tag ${t.depositReturned?'paid':'pending'}">${tr('deposito')} ${fmt$(t.depositAmount)} · ${t.depositReturned?tr('dep_devuelto'):tr('dep_pendiente')}</span>`:''}
       </div>
       <div class="item-amount pos">${fmt$(t.rentAmount)}</div>
     </div>`;
@@ -751,7 +914,7 @@ function renderRents(){
   const tenantIds = filterProp==='all' ? null : DB.tenants.filter(t=>t.propertyId===filterProp).map(t=>t.id);
   let items = tenantIds ? DB.rents.filter(r=>tenantIds.includes(r.tenantId)) : [...DB.rents];
   items = [...items].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado pagos de renta.</div>'; return; }
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_rents')+'</div>'; return; }
   list.innerHTML = items.map(r=>{
     const t = DB.tenants.find(t=>t.id===r.tenantId);
     const prop = t ? DB.properties.find(p=>p.id===t.propertyId) : null;
@@ -759,13 +922,13 @@ function renderRents(){
     const balance = due - paid;
     const status = balance<=0.001 ? 'pagado' : (paid>0 ? 'parcial' : 'pendiente');
     const tagClass = status==='pagado'?'paid':(status==='parcial'?'partial':'pending');
-    const tagText = status==='pagado'?'Pagado':(status==='parcial'?'Parcial':'Pendiente');
+    const tagText = status==='pagado'?tr('tag_pagado'):(status==='parcial'?tr('tag_parcial'):tr('tag_pendiente'));
     return `<div class="card card-green row-item" data-open="rentas:${r.id}">
       <div class="main">
-        <div class="item-name">${t?esc(t.name):'Inquilino eliminado'}</div>
-        <div class="item-meta">${r.date||''} · debía ${fmt$(due)}${prop?' · '+esc(prop.name):''}</div>
+        <div class="item-name">${t?esc(t.name):'—'}</div>
+        <div class="item-meta">${r.date||''} · ${tr('debia')} ${fmt$(due)}${prop?' · '+esc(prop.name):''}</div>
         <span class="tag ${tagClass}">${tagText}</span>
-        ${balance>0.001?`<div class="balance-note">Debe ${fmt$(balance)}</div>`:''}
+        ${balance>0.001?`<div class="balance-note">${tr('debe')} ${fmt$(balance)}</div>`:''}
       </div>
       <div class="item-amount ${status==='pagado'?'pos':'neg'}">${fmt$(paid)}</div>
     </div>`;
@@ -776,13 +939,15 @@ function renderRents(){
 function renderExpenses(){
   const list = $('#expensesList');
   const items = [...(filterProp==='all' ? DB.expenses : DB.expenses.filter(e=>e.propertyId===filterProp))].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado gastos aquí.</div>'; return; }
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_expenses')+'</div>'; return; }
   list.innerHTML = items.map(e=>{
     const prop = DB.properties.find(p=>p.id===e.propertyId);
+    const hasReceipt = e.receipts && e.receipts.length;
     return `<div class="card card-rose row-item" data-open="gastos:${e.id}">
+      ${hasReceipt?`<img class="thumb" src="${e.receipts[0]}" alt="">`:''}
       <div class="main">
         <div class="item-name">${esc(e.description||e.category)}</div>
-        <div class="item-meta">${e.date||''} · ${esc(e.category||'')}${prop?' · '+esc(prop.name):' · General'}</div>
+        <div class="item-meta">${e.date||''} · ${esc(e.category||'')}${prop?' · '+esc(prop.name):' · '+tr('general')}</div>
       </div>
       <div class="item-amount neg">${fmt$(e.amount)}</div>
     </div>`;
@@ -795,10 +960,10 @@ function renderMileage(){
   const items = [...DB.mileage].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   const total = items.reduce((s,x)=>s+Number(x.miles||0),0);
   $('#milesTotal').textContent = total + ' mi · ' + fmt$(total*0.70);
-  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado millas.</div>'; return; }
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_mileage')+'</div>'; return; }
   list.innerHTML = items.map(x=>`
     <div class="card card-indigo row-item" data-open="millas:${x.id}">
-      <div class="main"><div class="item-name">${esc(x.purpose||'Viaje de negocio')}</div><div class="item-meta">${x.date||''}</div></div>
+      <div class="main"><div class="item-name">${esc(x.purpose||'—')}</div><div class="item-meta">${x.date||''}</div></div>
       <div class="item-amount pos">${x.miles||0} mi</div>
     </div>`).join('');
 }
@@ -807,11 +972,55 @@ function renderMileage(){
 function renderHours(){
   const list = $('#hoursList');
   const items = [...DB.hours].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
-  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado horas.</div>'; return; }
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_hours')+'</div>'; return; }
   list.innerHTML = items.map(x=>`
     <div class="card card-amber row-item" data-open="horas:${x.id}">
-      <div class="main"><div class="item-name">${esc(x.task||'Trabajo del negocio')}</div><div class="item-meta">${x.date||''}</div></div>
+      <div class="main"><div class="item-name">${esc(x.task||tr('trabajo_negocio'))}</div><div class="item-meta">${x.date||''}</div></div>
       <div class="item-amount pos">${x.hours||0} h</div>
+    </div>`).join('');
+}
+
+/* ---------- PROVEEDORES ---------- */
+function renderProviders(){
+  const list = $('#providersList');
+  if(!list) return;
+  if(!DB.providers.length){ list.innerHTML = '<div class="empty">'+tr('empty_providers')+'</div>'; return; }
+  list.innerHTML = DB.providers.map(p=>`
+    <div class="card card-indigo row-item" data-open="proveedores:${p.id}">
+      <div class="main"><div class="item-name">${esc(p.name)}</div><div class="item-meta">${esc(p.service||'')}${p.phone?' · '+esc(p.phone):''}</div></div>
+    </div>`).join('');
+}
+
+/* ---------- TAREAS / LISTA DE ARREGLOS ---------- */
+function renderTasks(){
+  const list = $('#tasksList');
+  if(!list) return;
+  const items = [...DB.tasks].sort((a,b)=>(a.done?1:0)-(b.done?1:0));
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_tasks')+'</div>'; return; }
+  list.innerHTML = items.map(t=>{
+    const prop = DB.properties.find(p=>p.id===t.propertyId);
+    return `<div class="card card-amber row-item" data-open="tareas:${t.id}">
+      <div class="main"><div class="item-name" style="${t.done?'text-decoration:line-through; color:var(--ink-soft);':''}">${esc(t.description)}</div><div class="item-meta">${prop?esc(prop.name):tr('sin_propiedad')}</div></div>
+      <span class="tag ${t.done?'paid':'pending'}">${t.done?tr('resuelto'):tr('tag_pendiente')}</span>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- CONTRATOS POR VENCER (30 días / renovaciones) ---------- */
+function renderLeaseEnding(){
+  const list = $('#leaseEndingList');
+  if(!list) return;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const items = DB.tenants.filter(t=>t.leaseType==='fijo' && t.leaseEnd).map(t=>{
+    const end = new Date(t.leaseEnd+'T00:00:00');
+    const diff = Math.round((end-now)/(1000*60*60*24));
+    return {t, diff};
+  }).filter(x=>x.diff <= 30).sort((a,b)=>a.diff-b.diff);
+  if(!items.length){ list.innerHTML = '<div class="empty">'+tr('empty_leaseEnding')+'</div>'; return; }
+  list.innerHTML = items.map(x=>`
+    <div class="card card-blue row-item" data-open="inquilinos:${x.t.id}">
+      <div class="main"><div class="item-name">${esc(x.t.name)}</div><div class="item-meta">${x.t.leaseEnd}</div></div>
+      <span class="tag ${x.diff<0?'pending':'partial'}">${x.diff<0?tr('vencido'):tr('en_dias').replace('{n}', x.diff)}</span>
     </div>`).join('');
 }
 
@@ -1023,6 +1232,20 @@ function openForm(type, id){
     });
   }
 
+  if(type==='gastos'){
+    tempReceipts = (item?.receipts && item.receipts.length) ? [...item.receipts] : [];
+    renderReceiptGrid();
+    document.getElementById('f_receiptFiles').addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      for(const f of files){
+        try{ tempReceipts.push(await readAndCompressImage(f, 1000, 0.72)); }
+        catch(err){ alert('No se pudo procesar una imagen.'); }
+      }
+      renderReceiptGrid();
+      e.target.value = '';
+    });
+  }
+
   if(type==='inquilinos'){
     const leaseTypeSel = document.getElementById('f_leaseType');
     const leaseEndWrap = document.getElementById('leaseEndWrap');
@@ -1061,16 +1284,22 @@ function renderRoomPhotoGrid(){
   if(!grid) return;
   grid.innerHTML = tempRoomPhotos.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rmroomphoto="${i}">×</button></div>`).join('');
 }
+function renderReceiptGrid(){
+  const grid = document.getElementById('receiptGrid');
+  if(!grid) return;
+  grid.innerHTML = tempReceipts.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rmreceipt="${i}">×</button></div>`).join('');
+}
 function closeForm(){
   $('#overlay').classList.remove('open');
   editing = null;
   tempPhotos = [];
   tempRoomPhotos = [];
+  tempReceipts = [];
 }
 $('#overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeForm(); });
 
 function typeKey(type){
-  return {propiedades:'properties', inquilinos:'tenants', rentas:'rents', gastos:'expenses', millas:'mileage', horas:'hours'}[type];
+  return {propiedades:'properties', inquilinos:'tenants', rentas:'rents', gastos:'expenses', millas:'mileage', horas:'hours', proveedores:'providers', tareas:'tasks'}[type];
 }
 function tenantOptions(selectedId){
   return DB.tenants.map(t=>`<option value="${t.id}" ${t.id===selectedId?'selected':''}>${esc(t.name)}</option>`).join('');
@@ -1081,7 +1310,7 @@ function propertyOptions(selectedId, emptyLabel){
 }
 
 function formHTML(type, item){
-  const titles = {propiedades:'Propiedad', inquilinos:'Inquilino', rentas:'Pago de renta', gastos:'Gasto', millas:'Millas', horas:'Horas'};
+  const titles = {propiedades:'Propiedad', inquilinos:'Inquilino', rentas:'Pago de renta', gastos:'Gasto', millas:'Millas', horas:'Horas', proveedores:'Proveedor', tareas:'Tarea'};
   const isEdit = !!item;
   let fields = '';
 
@@ -1176,7 +1405,13 @@ function formHTML(type, item){
         </select>
       </div>
       <div class="field"><label>Descripción</label><input id="f_description" value="${esc(item?.description||'')}" placeholder="Ej. Reparación de plomería"></div>
-      <div class="field"><label>Propiedad</label><select id="f_propertyId">${propertyOptions(item?.propertyId, 'General (todas)')}</select></div>`;
+      <div class="field"><label>Propiedad</label><select id="f_propertyId">${propertyOptions(item?.propertyId, 'General (todas)')}</select></div>
+      <div class="field"><label>Recibo (opcional)</label>
+        <div class="photo-upload">
+          <input type="file" accept="image/*" multiple id="f_receiptFiles">
+          <div class="photo-grid" id="receiptGrid"></div>
+        </div>
+      </div>`;
   }
   if(type==='millas'){
     fields = `
@@ -1194,6 +1429,24 @@ function formHTML(type, item){
         <div class="field"><label>Horas</label><input id="f_hours" type="number" step="0.25" value="${item?.hours||''}" placeholder="2.5"></div>
       </div>
       <div class="field"><label>Tarea / actividad</label><input id="f_task" value="${esc(item?.task||'')}" placeholder="Mantenimiento, papeleo, mostrar unidad…"></div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
+  }
+  if(type==='proveedores'){
+    fields = `
+      <div class="field"><label>Nombre</label><input id="f_pname" value="${esc(item?.name||'')}" placeholder="Ej. Plomería Martínez"></div>
+      <div class="field"><label>Servicio</label><input id="f_service" value="${esc(item?.service||'')}" placeholder="Plomería, electricidad, jardinería…"></div>
+      <div class="field"><label>Teléfono</label><input id="f_pphone" value="${esc(item?.phone||'')}" placeholder="(555) 555-5555"></div>
+      <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
+  }
+  if(type==='tareas'){
+    fields = `
+      <div class="field"><label>Descripción</label><input id="f_description2" value="${esc(item?.description||'')}" placeholder="Ej. Cambiar filtro de A/C en Casa Roble"></div>
+      <div class="field"><label>Propiedad (opcional)</label><select id="f_taskPropertyId">${propertyOptions(item?.propertyId, 'Sin asignar')}</select></div>
+      <div class="field">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="f_done" style="width:auto;" ${item?.done?'checked':''}> Ya está resuelto
+        </label>
+      </div>
       <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
   }
 
@@ -1224,6 +1477,10 @@ document.addEventListener('click', async (e)=>{
     tempRoomPhotos.splice(Number(e.target.dataset.rmroomphoto), 1);
     renderRoomPhotoGrid();
   }
+  if(e.target.dataset.rmreceipt !== undefined){
+    tempReceipts.splice(Number(e.target.dataset.rmreceipt), 1);
+    renderReceiptGrid();
+  }
 });
 
 async function handleSave(){
@@ -1247,7 +1504,7 @@ async function handleSave(){
     if(!data.tenantId){ alert('Selecciona un inquilino.'); return; }
   }
   if(type==='gastos'){
-    data = {date:v('f_date'), amount:Number(v('f_amount'))||0, category:v('f_category'), description:v('f_description'), propertyId:v('f_propertyId')};
+    data = {date:v('f_date'), amount:Number(v('f_amount'))||0, category:v('f_category'), description:v('f_description'), propertyId:v('f_propertyId'), receipts:tempReceipts};
   }
   if(type==='millas'){
     data = {date:v('f_date'), miles:Number(v('f_miles'))||0, purpose:v('f_purpose'), notes:v('f_notes')};
@@ -1255,7 +1512,16 @@ async function handleSave(){
   if(type==='horas'){
     data = {date:v('f_date'), hours:Number(v('f_hours'))||0, task:v('f_task'), notes:v('f_notes')};
   }
+  if(type==='proveedores'){
+    data = {name:v('f_pname'), service:v('f_service'), phone:v('f_pphone'), notes:v('f_notes')};
+    if(!data.name.trim()){ alert('Escribe un nombre.'); return; }
+  }
+  if(type==='tareas'){
+    data = {description:v('f_description2'), propertyId:v('f_taskPropertyId'), done:document.getElementById('f_done').checked, notes:v('f_notes')};
+    if(!data.description.trim()){ alert('Escribe una descripción.'); return; }
+  }
 
+  logActivity((id?'Editado':'Agregado') + ': ' + titlesForLog(type, data));
   if(id){
     const idx = DB[key].findIndex(x=>x.id===id);
     DB[key][idx] = {...DB[key][idx], ...data};
@@ -1271,10 +1537,38 @@ async function handleDelete(){
   const {type, id} = editing;
   const key = typeKey(type);
   if(!confirm('¿Eliminar este registro? Esta acción no se puede deshacer.')) return;
+  logActivity('Eliminado: ' + type);
   DB[key] = DB[key].filter(x=>x.id!==id);
   await save(key);
   closeForm();
   renderAll();
+}
+
+/* ---------- Registro de actividad reciente ---------- */
+function titlesForLog(type, data){
+  const label = {propiedades:'propiedad', inquilinos:'inquilino', rentas:'pago de renta', gastos:'gasto', millas:'millas', horas:'horas', proveedores:'proveedor', tareas:'tarea'}[type] || type;
+  const name = data.name || data.description || data.purpose || data.task || '';
+  return label + (name?(' — '+name):'');
+}
+function logActivity(msg){
+  try{
+    const log = JSON.parse(localStorage.getItem('gestorRentas_activity') || '[]');
+    log.unshift({ts: new Date().toISOString(), msg});
+    localStorage.setItem('gestorRentas_activity', JSON.stringify(log.slice(0, 30)));
+  }catch(e){}
+  renderActivityLog();
+}
+function renderActivityLog(){
+  const el = document.getElementById('activityLog');
+  if(!el) return;
+  let log = [];
+  try{ log = JSON.parse(localStorage.getItem('gestorRentas_activity') || '[]'); }catch(e){}
+  if(!log.length){ el.innerHTML = tr('ajustes_sinActividad'); return; }
+  el.innerHTML = log.slice(0,10).map(l=>{
+    const d = new Date(l.ts);
+    const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    return `<div style="padding:6px 0; border-bottom:1px solid var(--line);">${esc(l.msg)}<br><span style="font-size:11px;">${when}</span></div>`;
+  }).join('');
 }
 
 /* ---------- Pantalla pública de solicitud (idioma + envío) ---------- */
@@ -1430,6 +1724,10 @@ async function loginWithBiometric(){
     return true;
   }catch(e){ return false; }
 }
+document.getElementById('btnToggleLang')?.addEventListener('click', ()=>{
+  setAppLang(appLang==='es' ? 'en' : 'es');
+});
+
 document.getElementById('btnEnableBio')?.addEventListener('click', registerBiometric);
 
 /* ---------- Cambiar usuario / contraseña desde Ajustes ---------- */
@@ -1487,6 +1785,63 @@ function checkAndNotify(){
   }
 }
 
+/* ---------- Pagos externos ---------- */
+function updateSharePaymentVisibility(){
+  const link = localStorage.getItem('gestorRentas_paymentLink') || '';
+  const btn = document.getElementById('btnSharePayment');
+  if(btn) btn.style.display = link ? 'block' : 'none';
+}
+document.getElementById('btnSavePaymentLink')?.addEventListener('click', ()=>{
+  const link = document.getElementById('set_paymentLink').value.trim();
+  localStorage.setItem('gestorRentas_paymentLink', link);
+  updateSharePaymentVisibility();
+  alert(link ? 'Link de pago guardado.' : 'Link de pago borrado.');
+});
+document.getElementById('btnSharePayment')?.addEventListener('click', async ()=>{
+  const link = localStorage.getItem('gestorRentas_paymentLink') || '';
+  if(!link) return;
+  if(navigator.share){
+    try{ await navigator.share({title:'Link de pago', text:'Puedes pagar tu renta aquí:', url:link}); }catch(e){}
+  }else{
+    try{ await navigator.clipboard.writeText(link); alert('Enlace copiado:\n'+link); }
+    catch(e){ prompt('Copia este enlace:', link); }
+  }
+});
+
+/* ---------- Copias de seguridad ---------- */
+document.getElementById('btnExportBackup')?.addEventListener('click', ()=>{
+  const backup = {};
+  KEYS.forEach(k=>{ backup[k] = DB[k]; });
+  backup._exportedAt = new Date().toISOString();
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'respaldo-gestor-rentas-' + todayStr() + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+});
+document.getElementById('importBackupFile')?.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  if(!confirm('Esto reemplaza todos tus datos actuales con los del respaldo. ¿Continuar?')){ e.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = async (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      for(const k of KEYS){
+        DB[k] = Array.isArray(data[k]) ? data[k] : [];
+        await save(k);
+      }
+      renderAll();
+      alert('Respaldo restaurado correctamente.');
+    }catch(err){
+      alert('El archivo no es un respaldo válido.');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
 /* ---------- Acceso con usuario y contraseña (candado local del dispositivo) ---------- */
 async function sha256(text){
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -1499,6 +1854,7 @@ function showApp(){
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
   loadAll();
+  updateSharePaymentVisibility();
   setTimeout(checkAndNotify, 800);
   if(localStorage.getItem('gestorRentas_notifPref')==='1' && document.getElementById('btnEnableNotif')){
     document.getElementById('btnEnableNotif').textContent = 'Notificaciones activadas ✓';
