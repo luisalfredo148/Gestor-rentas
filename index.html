@@ -503,7 +503,33 @@
   </header>
   <main style="max-width:520px;">
     <p class="hint" data-i18n="intro" style="font-size:14px; margin-bottom:18px;"></p>
-    <p class="tag pending" data-i18n="noPets" style="display:inline-block; margin-bottom:18px;"></p>
+    <p class="tag pending" data-i18n="roomOnlyNotice" style="display:inline-block; margin-bottom:18px;"></p>
+
+    <div class="card" style="margin-bottom:18px;">
+      <div class="item-name" data-i18n="rulesTitle" style="margin-bottom:10px;"></div>
+      <ul style="margin:0; padding-left:20px; font-size:14px; line-height:1.9; color:var(--ink);">
+        <li data-i18n="rule_noSmoking"></li>
+        <li data-i18n="rule_noAlcohol"></li>
+        <li data-i18n="rule_noParties"></li>
+        <li data-i18n="rule_noPets"></li>
+        <li data-i18n="rule_noDrugs"></li>
+      </ul>
+    </div>
+
+    <div class="card" id="galleryBox" style="display:none; margin-bottom:18px;">
+      <div class="item-name" style="margin-bottom:10px;" id="galleryTitle">Fotos</div>
+      <div class="field" id="galleryPropertyWrap" style="display:none;">
+        <label>Propiedad</label>
+        <select id="gal_property"></select>
+      </div>
+      <div id="galleryCommonPhotos" class="photo-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:14px;"></div>
+      <div class="field" id="galleryRoomWrap" style="display:none;">
+        <label>Habitación disponible</label>
+        <select id="gal_room"></select>
+      </div>
+      <div id="galleryRoomPhotos" class="photo-grid" style="grid-template-columns:repeat(3,1fr);"></div>
+    </div>
+
     <div class="card" id="verifyBox" style="display:none; margin-bottom:18px;">
       <div class="item-name" data-i18n="verifyTitle" style="margin-bottom:4px;"></div>
       <div class="item-meta" data-i18n="verifyDesc" style="margin-bottom:12px;"></div>
@@ -1190,6 +1216,59 @@ $('#btnShareReport').addEventListener('click', async ()=>{
   }
 });
 
+/* ---------- Galería de fotos visible para quien llena la solicitud (solo lectura) ---------- */
+function initSolicitudGallery(){
+  let properties = [], tenants = [];
+  try{ properties = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'properties') || '[]'); }catch(e){}
+  try{ tenants = JSON.parse(localStorage.getItem(STORAGE_PREFIX+'tenants') || '[]'); }catch(e){}
+
+  if(!properties.length){ return; } // dispositivo sin datos: no se muestra galería
+
+  document.getElementById('galleryBox').style.display = 'block';
+
+  const propSelect = document.getElementById('gal_property');
+  const propWrap = document.getElementById('galleryPropertyWrap');
+  const roomSelect = document.getElementById('gal_room');
+  const roomWrap = document.getElementById('galleryRoomWrap');
+  const commonPhotosEl = document.getElementById('galleryCommonPhotos');
+  const roomPhotosEl = document.getElementById('galleryRoomPhotos');
+
+  if(properties.length > 1){
+    propWrap.style.display = 'block';
+    propSelect.innerHTML = properties.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('');
+  }
+
+  function showProperty(propertyId){
+    const p = properties.find(x=>x.id===propertyId) || properties[0];
+    const photos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : []);
+    commonPhotosEl.innerHTML = photos.length
+      ? photos.map(src=>`<div class="ph"><img src="${src}"></div>`).join('')
+      : '<div class="empty" style="grid-column:1/-1;">Sin fotos de áreas comunes todavía.</div>';
+
+    const rooms = tenants.filter(t=>t.propertyId===p.id && t.room);
+    if(rooms.length){
+      roomWrap.style.display = 'block';
+      roomSelect.innerHTML = rooms.map(t=>`<option value="${t.id}">${esc(t.room)}</option>`).join('');
+      showRoom(rooms[0].id);
+    }else{
+      roomWrap.style.display = 'none';
+      roomPhotosEl.innerHTML = '';
+    }
+  }
+  function showRoom(tenantId){
+    const t = tenants.find(x=>x.id===tenantId);
+    if(!t) return;
+    const photos = (t.roomPhotos && t.roomPhotos.length) ? t.roomPhotos : (t.roomPhoto ? [t.roomPhoto] : []);
+    roomPhotosEl.innerHTML = photos.length
+      ? photos.map(src=>`<div class="ph"><img src="${src}"></div>`).join('')
+      : '<div class="empty" style="grid-column:1/-1;">Sin fotos de esta habitación todavía.</div>';
+  }
+
+  propSelect.addEventListener('change', ()=>showProperty(propSelect.value));
+  roomSelect.addEventListener('change', ()=>showRoom(roomSelect.value));
+  showProperty(properties[0].id);
+}
+
 function initReporte(){
   const form = document.getElementById('reportForm');
   const btn = document.getElementById('reportSubmitBtn');
@@ -1809,6 +1888,13 @@ const I18N = {
     title:'Solicitud de Arrendamiento', subtitle:'Completa el formulario para aplicar',
     intro:'Llena tus datos con la mayor precisión posible. Te contactaremos en cuanto revisemos tu solicitud.',
     noPets:'Esta propiedad no acepta mascotas.',
+    roomOnlyNotice:'Estás aplicando para rentar una habitación, no la casa completa. Las áreas comunes (sala, cocina, baño) se comparten con los demás inquilinos.',
+    rulesTitle:'Reglas de la casa',
+    rule_noSmoking:'No fumar dentro de la propiedad',
+    rule_noAlcohol:'No consumir alcohol en la propiedad',
+    rule_noParties:'No se permiten fiestas ni reuniones ruidosas',
+    rule_noPets:'No se permiten mascotas',
+    rule_noDrugs:'No se permite ningún tipo de droga',
     verifyTitle:'Verificación de antecedentes y crédito (opcional)',
     verifyDesc:'Puedes acelerar tu solicitud verificando tu historial crediticio y de antecedentes a través de nuestro socio de confianza. El costo lo cubres tú directamente con ellos.',
     verifyBtnLabel:'Verificar mi historial',
@@ -1827,6 +1913,13 @@ const I18N = {
     title:'Rental Application', subtitle:'Fill out the form to apply',
     intro:'Please fill in your information as accurately as possible. We will contact you once we review your application.',
     noPets:'This property does not accept pets.',
+    roomOnlyNotice:'You are applying to rent a room, not the entire house. Common areas (living room, kitchen, bathroom) are shared with other tenants.',
+    rulesTitle:'House rules',
+    rule_noSmoking:'No smoking inside the property',
+    rule_noAlcohol:'No alcohol consumption on the property',
+    rule_noParties:'No parties or loud gatherings',
+    rule_noPets:'No pets allowed',
+    rule_noDrugs:'No drugs of any kind allowed',
     verifyTitle:'Background & credit check (optional)',
     verifyDesc:'You can speed up your application by verifying your credit and background history through our trusted partner. The cost is paid directly by you to them.',
     verifyBtnLabel:'Verify my history',
@@ -1862,6 +1955,7 @@ function initSolicitud(){
     document.getElementById('verifyBox').style.display = 'block';
     document.getElementById('verifyBtn').href = VERIFICATION_LINK;
   }
+  initSolicitudGallery();
   const form = document.getElementById('appForm');
   const btn = document.getElementById('submitBtn');
   const msgBox = document.getElementById('msgBox');
