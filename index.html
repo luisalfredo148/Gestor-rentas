@@ -403,6 +403,19 @@
     </div>
 
     <div class="card" style="margin-bottom:16px;">
+      <div class="item-name" style="margin-bottom:2px;">Criterios de evaluación</div>
+      <div class="item-meta" style="margin-bottom:14px;">Tus propios criterios de referencia al revisar solicitudes. Esto no evalúa automáticamente — es solo para que lo tengas presente al decidir.</div>
+      <div class="field"><label>Ingreso mínimo mensual (veces la renta)</label><input id="set_incomeMultiplier" type="number" step="0.5" placeholder="Ej. 3"></div>
+      <div class="field">
+        <label style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="set_requireCheck" style="width:auto;"> Requerir verificación de crédito/antecedentes
+        </label>
+      </div>
+      <div class="field"><label>Otros criterios</label><textarea id="set_screeningNotes" placeholder="Ej. Sin desalojos en los últimos 5 años, referencia de empleador…"></textarea></div>
+      <button class="btn ghost block" id="btnSaveScreening" style="width:100%;">Guardar criterios</button>
+    </div>
+
+    <div class="card" style="margin-bottom:16px;">
       <div class="item-name" style="margin-bottom:2px;" data-i18n-app="ajustes_respaldoTitle">Copias de seguridad</div>
       <div class="item-meta" style="margin-bottom:14px;" data-i18n-app="ajustes_respaldoDesc">Descarga todos tus datos como respaldo, o restaura desde un respaldo anterior.</div>
       <button class="btn ghost block" id="btnExportBackup" style="width:100%; margin-bottom:10px;" data-i18n-app="ajustes_exportar">Exportar todos mis datos</button>
@@ -424,6 +437,9 @@
 
   <!-- HERRAMIENTAS -->
   <section class="view" id="view-herramientas">
+    <div class="section-title" style="color:var(--teal-dark); border-left:4px solid var(--teal-dark); padding-left:9px;">Calendario (próximos 60 días)</div>
+    <div id="calendarList"></div>
+
     <div class="section-title c-blue" data-i18n-app="sec_leaseEnding">Contratos por vencer</div>
     <div id="leaseEndingList"></div>
 
@@ -438,6 +454,12 @@
       <button id="btnAddTask" style="background:none; border:none; color:var(--amber); font-weight:700; font-size:20px; cursor:pointer;">+</button>
     </div>
     <div id="tasksList"></div>
+
+    <div class="section-title c-rose" style="display:flex; align-items:center; justify-content:space-between;">
+      <span>Inspecciones</span>
+      <button id="btnAddInspection" style="background:none; border:none; color:var(--rose); font-weight:700; font-size:20px; cursor:pointer;">+</button>
+    </div>
+    <div id="inspectionsList"></div>
   </section>
 </main>
 
@@ -602,14 +624,16 @@
 
 <script>
 const STORAGE_PREFIX = 'gestorRentas_';
-const KEYS = ['properties','tenants','rents','expenses','mileage','hours','providers','tasks'];
-let DB = { properties:[], tenants:[], rents:[], expenses:[], mileage:[], hours:[], providers:[], tasks:[] };
+const KEYS = ['properties','tenants','rents','expenses','mileage','hours','providers','tasks','inspections'];
+let DB = { properties:[], tenants:[], rents:[], expenses:[], mileage:[], hours:[], providers:[], tasks:[], inspections:[] };
 let currentView = 'resumen';
 let editing = null;
 let filterProp = 'all';
 let tempPhotos = [];
 let tempRoomPhotos = [];
 let tempReceipts = [];
+let tempInspectionPhotos = [];
+let tempTenantDocs = [];
 
 /* ---------- Motor de traducción de la app principal (ES/EN) ---------- */
 let appLang = localStorage.getItem('gestorRentas_appLang') || 'es';
@@ -784,12 +808,14 @@ document.querySelectorAll('nav.bottom button').forEach(b=>b.addEventListener('cl
 document.getElementById('btnOpenSettings')?.addEventListener('click', ()=>switchView('ajustes'));
 document.getElementById('btnAddProvider')?.addEventListener('click', ()=>openForm('proveedores', null));
 document.getElementById('btnAddTask')?.addEventListener('click', ()=>openForm('tareas', null));
+document.getElementById('btnAddInspection')?.addEventListener('click', ()=>openForm('inspecciones', null));
 
 function renderAjustes(){
   const auth = getAuth();
   document.getElementById('ajustesCurrentUser').textContent = auth ? auth.user : '—';
   document.getElementById('set_paymentLink').value = localStorage.getItem('gestorRentas_paymentLink') || '';
   document.getElementById('btnToggleLang').textContent = appLang==='es' ? 'English' : 'Español';
+  loadScreeningSettings();
   renderActivityLog();
 }
 
@@ -805,6 +831,8 @@ function renderAll(){
   renderProviders();
   renderTasks();
   renderLeaseEnding();
+  renderInspections();
+  renderCalendar();
 }
 
 /* ---------- Chips (filtro por propiedad) ---------- */
@@ -882,7 +910,10 @@ function renderProperties(){
       <div class="body">
         <div class="item-name">${esc(p.name)}</div>
         <div class="item-meta">${esc(p.address||'—')} · ${tenantCount} ${tr('nav_inquilinos').toLowerCase()}</div>
-        ${p.videoLink?`<a href="${esc(p.videoLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="tag" style="margin-top:8px; text-decoration:none;">▶ ${tr('ver_video')}</a>`:''}
+        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+          <button onclick="event.stopPropagation(); openGallery('${p.id}')" class="tag" style="border:none; cursor:pointer; background:#DCEAE7; color:var(--teal-dark);">🖼 Ver galería</button>
+          ${p.videoLink?`<a href="${esc(p.videoLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()" class="tag" style="text-decoration:none;">▶ ${tr('ver_video')}</a>`:''}
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -1024,6 +1055,91 @@ function renderLeaseEnding(){
     </div>`).join('');
 }
 
+/* ---------- INSPECCIONES ---------- */
+function renderInspections(){
+  const list = $('#inspectionsList');
+  if(!list) return;
+  const items = [...DB.inspections].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(!items.length){ list.innerHTML = '<div class="empty">Aún no has registrado inspecciones.</div>'; return; }
+  list.innerHTML = items.map(x=>{
+    const prop = DB.properties.find(p=>p.id===x.propertyId);
+    const hasPhotos = x.photos && x.photos.length;
+    return `<div class="card card-rose row-item" data-open="inspecciones:${x.id}">
+      ${hasPhotos?`<img class="thumb" src="${x.photos[0]}" alt="">`:''}
+      <div class="main"><div class="item-name">${esc(x.type||'Inspección')}${prop?' · '+esc(prop.name):''}</div><div class="item-meta">${x.date||''}</div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ---------- CALENDARIO (vista unificada de próximos 60 días) ---------- */
+function renderCalendar(){
+  const list = $('#calendarList');
+  if(!list) return;
+  const now = new Date(); now.setHours(0,0,0,0);
+  const horizon = 60;
+  const events = [];
+
+  DB.tenants.forEach(t=>{
+    const info = daysUntilPayDay(t.payDay);
+    if(info && info.diff <= horizon){
+      events.push({date: info.date, diff: info.diff, label: 'Cobro: ' + t.name, type:'cobro'});
+    }
+    if(t.leaseType==='fijo' && t.leaseEnd){
+      const end = new Date(t.leaseEnd+'T00:00:00');
+      const diff = Math.round((end-now)/(1000*60*60*24));
+      if(diff >= 0 && diff <= horizon){
+        events.push({date: end, diff, label: 'Contrato termina: ' + t.name, type:'contrato'});
+      }
+    }
+  });
+  DB.inspections.forEach(x=>{
+    if(!x.date) return;
+    const d = new Date(x.date+'T00:00:00');
+    const diff = Math.round((d-now)/(1000*60*60*24));
+    if(diff >= 0 && diff <= horizon){
+      const prop = DB.properties.find(p=>p.id===x.propertyId);
+      events.push({date: d, diff, label: (x.type||'Inspección') + (prop?' · '+prop.name:''), type:'inspeccion'});
+    }
+  });
+
+  events.sort((a,b)=>a.diff-b.diff);
+
+  if(!events.length){ list.innerHTML = '<div class="empty">No hay eventos programados en los próximos 60 días.</div>'; return; }
+  const tagFor = {cobro:'paid', contrato:'partial', inspeccion:'pending'};
+  const colorFor = {cobro:'green', contrato:'blue', inspeccion:'rose'};
+  list.innerHTML = events.map(ev=>`
+    <div class="card card-${colorFor[ev.type]} row-item">
+      <div class="main"><div class="item-name">${esc(ev.label)}</div><div class="item-meta">${ev.date.toLocaleDateString()}</div></div>
+      <span class="tag ${tagFor[ev.type]}">${ev.diff===0?'Hoy':'En '+ev.diff+' días'}</span>
+    </div>`).join('');
+}
+
+/* ---------- Galería de fotos (propiedad + cada habitación) ---------- */
+function openGallery(propertyId){
+  const p = DB.properties.find(x=>x.id===propertyId);
+  if(!p) return;
+  const propPhotos = (p.photos && p.photos.length) ? p.photos : (p.photo ? [p.photo] : []);
+  const tenants = DB.tenants.filter(t=>t.propertyId===propertyId);
+
+  let html = `<h2>${esc(p.name)}</h2>`;
+  html += `<div class="section-title c-blue" style="margin-top:0;">Áreas comunes</div>`;
+  html += propPhotos.length
+    ? `<div class="photo-grid" style="grid-template-columns:repeat(3,1fr);">${propPhotos.map(src=>`<div class="ph" style="position:relative;"><img src="${src}"></div>`).join('')}</div>`
+    : `<div class="empty">Esta propiedad no tiene fotos todavía.</div>`;
+
+  tenants.forEach(t=>{
+    const roomPhotos = (t.roomPhotos && t.roomPhotos.length) ? t.roomPhotos : (t.roomPhoto ? [t.roomPhoto] : []);
+    html += `<div class="section-title c-purple">${esc(t.room || 'Habitación sin nombre')}</div>`;
+    html += roomPhotos.length
+      ? `<div class="photo-grid" style="grid-template-columns:repeat(3,1fr);">${roomPhotos.map(src=>`<div class="ph" style="position:relative;"><img src="${src}"></div>`).join('')}</div>`
+      : `<div class="empty">Sin fotos de esta habitación todavía.</div>`;
+  });
+
+  html += `<div class="sheet-actions"><button class="btn primary" id="btnCancel" style="flex:1;">Cerrar</button></div>`;
+  $('#sheet').innerHTML = html;
+  $('#overlay').classList.add('open');
+}
+
 /* ---------- Click delegation: abrir edición ---------- */
 document.addEventListener('click', (e)=>{
   const el = e.target.closest('[data-open]');
@@ -1117,10 +1233,17 @@ function openReportSheet(){
   const years = new Set([String(new Date().getFullYear())]);
   [...DB.rents, ...DB.expenses, ...DB.mileage, ...DB.hours].forEach(x=>{ if(x.date) years.add(x.date.slice(0,4)); });
   const yearList = [...years].sort().reverse();
+  const months = [
+    ['','Todo el año'],['01','Enero'],['02','Febrero'],['03','Marzo'],['04','Abril'],['05','Mayo'],['06','Junio'],
+    ['07','Julio'],['08','Agosto'],['09','Septiembre'],['10','Octubre'],['11','Noviembre'],['12','Diciembre']
+  ];
   $('#sheet').innerHTML = `
     <h2>Reporte para tu contador</h2>
-    <div class="field"><label>Año</label><select id="rp_year">${yearList.map(y=>`<option value="${y}">${y}</option>`).join('')}</select></div>
-    <p class="hint">Incluye renta cobrada, gastos por categoría, millas y horas del año seleccionado, listo para descargar como CSV y compartir con tu contador.</p>
+    <div class="two-col">
+      <div class="field"><label>Año</label><select id="rp_year">${yearList.map(y=>`<option value="${y}">${y}</option>`).join('')}</select></div>
+      <div class="field"><label>Periodo</label><select id="rp_month">${months.map(m=>`<option value="${m[0]}">${m[1]}</option>`).join('')}</select></div>
+    </div>
+    <p class="hint">Incluye renta cobrada, gastos por categoría, millas y horas del periodo seleccionado, listo para descargar como CSV y compartir con tu contador.</p>
     <div class="sheet-actions">
       <button class="btn ghost" id="btnCancel">Cancelar</button>
       <button class="btn primary" id="btnDownloadReport">Descargar CSV</button>
@@ -1130,14 +1253,16 @@ function openReportSheet(){
 
 function csvEsc(v){ return '"' + String(v==null?'':v).replace(/"/g,'""') + '"'; }
 
-function downloadReport(year){
+function downloadReport(year, month){
+  const prefix = month ? (year+'-'+month) : year;
+  const label = month ? (year+'-'+month) : year;
   const rows = [];
-  rows.push(['Reporte de impuestos', year]);
+  rows.push(['Reporte de impuestos', label]);
   rows.push([]);
   rows.push(['INGRESOS POR RENTA']);
   rows.push(['Fecha','Inquilino','Propiedad','Monto debido','Monto pagado']);
   let totalPaid = 0;
-  DB.rents.filter(r=>r.date && r.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
+  DB.rents.filter(r=>r.date && r.date.startsWith(prefix)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(r=>{
     const t = DB.tenants.find(t=>t.id===r.tenantId);
     const p = t ? DB.properties.find(p=>p.id===t.propertyId) : null;
     totalPaid += Number(r.amountPaid||0);
@@ -1148,7 +1273,7 @@ function downloadReport(year){
   rows.push(['GASTOS']);
   rows.push(['Fecha','Categoría','Descripción','Propiedad','Monto']);
   let totalExp = 0;
-  DB.expenses.filter(e=>e.date && e.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
+  DB.expenses.filter(e=>e.date && e.date.startsWith(prefix)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>{
     const p = DB.properties.find(p=>p.id===e.propertyId);
     totalExp += Number(e.amount||0);
     rows.push([e.date, e.category||'', e.description||'', p?p.name:'General', e.amount||0]);
@@ -1158,7 +1283,7 @@ function downloadReport(year){
   rows.push(['MILLAS']);
   rows.push(['Fecha','Propósito','Millas']);
   let totalMiles = 0;
-  DB.mileage.filter(x=>x.date && x.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
+  DB.mileage.filter(x=>x.date && x.date.startsWith(prefix)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
     totalMiles += Number(x.miles||0);
     rows.push([x.date, x.purpose||'', x.miles||0]);
   });
@@ -1168,7 +1293,7 @@ function downloadReport(year){
   rows.push(['HORAS']);
   rows.push(['Fecha','Tarea','Horas']);
   let totalHours = 0;
-  DB.hours.filter(x=>x.date && x.date.startsWith(year)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
+  DB.hours.filter(x=>x.date && x.date.startsWith(prefix)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
     totalHours += Number(x.hours||0);
     rows.push([x.date, x.task||'', x.hours||0]);
   });
@@ -1183,7 +1308,7 @@ function downloadReport(year){
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = 'reporte-impuestos-' + year + '.csv';
+  a.href = url; a.download = 'reporte-' + prefix + '.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   setTimeout(()=>URL.revokeObjectURL(url), 2000);
 }
@@ -1246,6 +1371,20 @@ function openForm(type, id){
     });
   }
 
+  if(type==='inspecciones'){
+    tempInspectionPhotos = (item?.photos && item.photos.length) ? [...item.photos] : [];
+    renderInspectionGrid();
+    document.getElementById('f_inspectionFiles').addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      for(const f of files){
+        try{ tempInspectionPhotos.push(await readAndCompressImage(f, 1000, 0.72)); }
+        catch(err){ alert('No se pudo procesar una imagen.'); }
+      }
+      renderInspectionGrid();
+      e.target.value = '';
+    });
+  }
+
   if(type==='inquilinos'){
     const leaseTypeSel = document.getElementById('f_leaseType');
     const leaseEndWrap = document.getElementById('leaseEndWrap');
@@ -1272,6 +1411,17 @@ function openForm(type, id){
       renderRoomPhotoGrid();
       e.target.value = '';
     });
+    tempTenantDocs = (item?.documents && item.documents.length) ? [...item.documents] : [];
+    renderTenantDocGrid();
+    document.getElementById('f_tenantDocFiles').addEventListener('change', async (e)=>{
+      const files = Array.from(e.target.files);
+      for(const f of files){
+        try{ tempTenantDocs.push(await readAndCompressImage(f, 1200, 0.75)); }
+        catch(err){ alert('No se pudo procesar una imagen.'); }
+      }
+      renderTenantDocGrid();
+      e.target.value = '';
+    });
   }
 }
 function renderPropPhotoGrid(){
@@ -1289,17 +1439,29 @@ function renderReceiptGrid(){
   if(!grid) return;
   grid.innerHTML = tempReceipts.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rmreceipt="${i}">×</button></div>`).join('');
 }
+function renderInspectionGrid(){
+  const grid = document.getElementById('inspectionGrid');
+  if(!grid) return;
+  grid.innerHTML = tempInspectionPhotos.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rminspphoto="${i}">×</button></div>`).join('');
+}
+function renderTenantDocGrid(){
+  const grid = document.getElementById('tenantDocGrid');
+  if(!grid) return;
+  grid.innerHTML = tempTenantDocs.map((src,i)=>`<div class="ph"><img src="${src}"><button type="button" data-rmdoc="${i}">×</button></div>`).join('');
+}
 function closeForm(){
   $('#overlay').classList.remove('open');
   editing = null;
   tempPhotos = [];
   tempRoomPhotos = [];
   tempReceipts = [];
+  tempInspectionPhotos = [];
+  tempTenantDocs = [];
 }
 $('#overlay').addEventListener('click', (e)=>{ if(e.target.id==='overlay') closeForm(); });
 
 function typeKey(type){
-  return {propiedades:'properties', inquilinos:'tenants', rentas:'rents', gastos:'expenses', millas:'mileage', horas:'hours', proveedores:'providers', tareas:'tasks'}[type];
+  return {propiedades:'properties', inquilinos:'tenants', rentas:'rents', gastos:'expenses', millas:'mileage', horas:'hours', proveedores:'providers', tareas:'tasks', inspecciones:'inspections'}[type];
 }
 function tenantOptions(selectedId){
   return DB.tenants.map(t=>`<option value="${t.id}" ${t.id===selectedId?'selected':''}>${esc(t.name)}</option>`).join('');
@@ -1310,7 +1472,7 @@ function propertyOptions(selectedId, emptyLabel){
 }
 
 function formHTML(type, item){
-  const titles = {propiedades:'Propiedad', inquilinos:'Inquilino', rentas:'Pago de renta', gastos:'Gasto', millas:'Millas', horas:'Horas', proveedores:'Proveedor', tareas:'Tarea'};
+  const titles = {propiedades:'Propiedad', inquilinos:'Inquilino', rentas:'Pago de renta', gastos:'Gasto', millas:'Millas', horas:'Horas', proveedores:'Proveedor', tareas:'Tarea', inspecciones:'Inspección'};
   const isEdit = !!item;
   let fields = '';
 
@@ -1331,8 +1493,23 @@ function formHTML(type, item){
       <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
   }
   if(type==='inquilinos'){
+    const paymentHistory = item ? DB.rents.filter(r=>r.tenantId===item.id).sort((a,b)=>(b.date||'').localeCompare(a.date||'')) : [];
+    const historyHTML = item ? `
+      <div class="field">
+        <label>Historial de pagos</label>
+        <div style="max-height:180px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; padding:8px 12px; background:var(--surface);">
+          ${paymentHistory.length ? paymentHistory.map(r=>{
+            const due = Number(r.amountDue||0), paid = Number(r.amountPaid||0);
+            const st = paid>=due ? 'Pagado' : (paid>0 ? 'Parcial' : 'Pendiente');
+            return `<div style="display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line); font-size:13px;">
+              <span>${r.date||''} · ${st}</span><span style="font-weight:600;">${fmt$(paid)} / ${fmt$(due)}</span>
+            </div>`;
+          }).join('') : '<div style="font-size:13px; color:var(--ink-soft); padding:6px 0;">Sin pagos registrados todavía.</div>'}
+        </div>
+      </div>` : '';
     fields = `
       <div class="field"><label>Nombre</label><input id="f_name" value="${esc(item?.name||'')}" placeholder="Ej. Ana Torres"></div>
+      ${historyHTML}
       <div class="field"><label>Propiedad</label><select id="f_propertyId">${propertyOptions(item?.propertyId, 'Sin propiedad asignada')}</select></div>
       <div class="two-col">
         <div class="field"><label>Habitación / unidad</label><input id="f_room" value="${esc(item?.room||'')}" placeholder="Habitación 2"></div>
@@ -1372,6 +1549,26 @@ function formHTML(type, item){
       <div class="two-col" id="depositReturnWrap" style="${item?.depositReturned?'':'display:none;'}">
         <div class="field"><label>Fecha de devolución</label><input id="f_depositReturnDate" type="date" value="${item?.depositReturnDate||''}"></div>
         <div class="field"><label>Monto devuelto</label><input id="f_depositReturnAmount" type="number" step="0.01" value="${item?.depositReturnAmount??''}" placeholder="500"></div>
+      </div>
+      <div class="two-col">
+        <div class="field">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" id="f_moveInDone" style="width:auto;" ${item?.moveInDone?'checked':''}> Mudanza de entrada hecha
+          </label>
+          <input id="f_moveInDate" type="date" value="${item?.moveInDate||''}" style="margin-top:6px;">
+        </div>
+        <div class="field">
+          <label style="display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" id="f_moveOutDone" style="width:auto;" ${item?.moveOutDone?'checked':''}> Mudanza de salida hecha
+          </label>
+          <input id="f_moveOutDate" type="date" value="${item?.moveOutDate||''}" style="margin-top:6px;">
+        </div>
+      </div>
+      <div class="field"><label>Documentos (ID, contrato firmado)</label>
+        <div class="photo-upload">
+          <input type="file" accept="image/*" multiple id="f_tenantDocFiles">
+          <div class="photo-grid" id="tenantDocGrid"></div>
+        </div>
       </div>
       <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas adicionales">${esc(item?.notes||'')}</textarea></div>`;
   }
@@ -1449,6 +1646,25 @@ function formHTML(type, item){
       </div>
       <div class="field"><label>Notas</label><textarea id="f_notes" placeholder="Notas">${esc(item?.notes||'')}</textarea></div>`;
   }
+  if(type==='inspecciones'){
+    fields = `
+      <div class="two-col">
+        <div class="field"><label>Fecha</label><input id="f_iDate" type="date" value="${item?.date||todayStr()}"></div>
+        <div class="field"><label>Tipo</label>
+          <select id="f_iType">
+            ${['Entrada','Salida','Rutinaria','Reparación'].map(o=>`<option ${item?.type===o?'selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Propiedad</label><select id="f_iPropertyId">${propertyOptions(item?.propertyId, 'Sin asignar')}</select></div>
+      <div class="field"><label>Notas / hallazgos</label><textarea id="f_notes" placeholder="Estado de la propiedad, daños, observaciones…">${esc(item?.notes||'')}</textarea></div>
+      <div class="field"><label>Fotos (opcional)</label>
+        <div class="photo-upload">
+          <input type="file" accept="image/*" multiple id="f_inspectionFiles">
+          <div class="photo-grid" id="inspectionGrid"></div>
+        </div>
+      </div>`;
+  }
 
   return `
     <h2>${isEdit?'Editar':'Agregar'} ${titles[type]}</h2>
@@ -1466,7 +1682,8 @@ document.addEventListener('click', async (e)=>{
   if(e.target.id==='btnDelete'){ await handleDelete(); }
   if(e.target.id==='btnDownloadReport'){
     const year = document.getElementById('rp_year').value;
-    downloadReport(year);
+    const month = document.getElementById('rp_month').value;
+    downloadReport(year, month);
     closeForm();
   }
   if(e.target.dataset.rmphoto !== undefined){
@@ -1480,6 +1697,14 @@ document.addEventListener('click', async (e)=>{
   if(e.target.dataset.rmreceipt !== undefined){
     tempReceipts.splice(Number(e.target.dataset.rmreceipt), 1);
     renderReceiptGrid();
+  }
+  if(e.target.dataset.rminspphoto !== undefined){
+    tempInspectionPhotos.splice(Number(e.target.dataset.rminspphoto), 1);
+    renderInspectionGrid();
+  }
+  if(e.target.dataset.rmdoc !== undefined){
+    tempTenantDocs.splice(Number(e.target.dataset.rmdoc), 1);
+    renderTenantDocGrid();
   }
 });
 
@@ -1496,7 +1721,7 @@ async function handleSave(){
   if(type==='inquilinos'){
     const leaseType = v('f_leaseType') || 'mensual';
     const depositReturned = document.getElementById('f_depositReturned').checked;
-    data = {name:v('f_name'), propertyId:v('f_propertyId'), room:v('f_room'), roomPhotos:tempRoomPhotos, rentAmount:Number(v('f_rentAmount'))||0, payDay:v('f_payDay')?Number(v('f_payDay')):null, phone:v('f_phone'), email:v('f_email'), leaseType, leaseStart:v('f_leaseStart'), leaseEnd:leaseType==='fijo'?v('f_leaseEnd'):'', depositAmount:Number(v('f_depositAmount'))||0, depositDate:v('f_depositDate'), depositReturned, depositReturnDate:depositReturned?v('f_depositReturnDate'):'', depositReturnAmount:depositReturned?(Number(v('f_depositReturnAmount'))||0):null, notes:v('f_notes')};
+    data = {name:v('f_name'), propertyId:v('f_propertyId'), room:v('f_room'), roomPhotos:tempRoomPhotos, rentAmount:Number(v('f_rentAmount'))||0, payDay:v('f_payDay')?Number(v('f_payDay')):null, phone:v('f_phone'), email:v('f_email'), leaseType, leaseStart:v('f_leaseStart'), leaseEnd:leaseType==='fijo'?v('f_leaseEnd'):'', depositAmount:Number(v('f_depositAmount'))||0, depositDate:v('f_depositDate'), depositReturned, depositReturnDate:depositReturned?v('f_depositReturnDate'):'', depositReturnAmount:depositReturned?(Number(v('f_depositReturnAmount'))||0):null, moveInDone:document.getElementById('f_moveInDone').checked, moveInDate:v('f_moveInDate'), moveOutDone:document.getElementById('f_moveOutDone').checked, moveOutDate:v('f_moveOutDate'), documents:tempTenantDocs, notes:v('f_notes')};
     if(!data.name.trim()){ alert('Escribe un nombre.'); return; }
   }
   if(type==='rentas'){
@@ -1519,6 +1744,9 @@ async function handleSave(){
   if(type==='tareas'){
     data = {description:v('f_description2'), propertyId:v('f_taskPropertyId'), done:document.getElementById('f_done').checked, notes:v('f_notes')};
     if(!data.description.trim()){ alert('Escribe una descripción.'); return; }
+  }
+  if(type==='inspecciones'){
+    data = {date:v('f_iDate'), type:v('f_iType'), propertyId:v('f_iPropertyId'), notes:v('f_notes'), photos:tempInspectionPhotos};
   }
 
   logActivity((id?'Editado':'Agregado') + ': ' + titlesForLog(type, data));
@@ -1797,6 +2025,25 @@ document.getElementById('btnSavePaymentLink')?.addEventListener('click', ()=>{
   updateSharePaymentVisibility();
   alert(link ? 'Link de pago guardado.' : 'Link de pago borrado.');
 });
+
+/* ---------- Criterios de evaluación de solicitantes ---------- */
+document.getElementById('btnSaveScreening')?.addEventListener('click', ()=>{
+  const data = {
+    incomeMultiplier: document.getElementById('set_incomeMultiplier').value,
+    requireCheck: document.getElementById('set_requireCheck').checked,
+    notes: document.getElementById('set_screeningNotes').value
+  };
+  localStorage.setItem('gestorRentas_screening', JSON.stringify(data));
+  alert('Criterios guardados.');
+});
+function loadScreeningSettings(){
+  try{
+    const data = JSON.parse(localStorage.getItem('gestorRentas_screening') || '{}');
+    if(document.getElementById('set_incomeMultiplier')) document.getElementById('set_incomeMultiplier').value = data.incomeMultiplier || '';
+    if(document.getElementById('set_requireCheck')) document.getElementById('set_requireCheck').checked = !!data.requireCheck;
+    if(document.getElementById('set_screeningNotes')) document.getElementById('set_screeningNotes').value = data.notes || '';
+  }catch(e){}
+}
 document.getElementById('btnSharePayment')?.addEventListener('click', async ()=>{
   const link = localStorage.getItem('gestorRentas_paymentLink') || '';
   if(!link) return;
